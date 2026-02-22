@@ -145,7 +145,7 @@ func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (
 	ppg := fmt.Sprintf("%.2f", ppgFloat)
 
 	// Get playing today status
-	pt, err := playingToday(stats.CurrentTeamAbbrev)
+	pt, err := playingToday(stats.CurrentTeamAbbrev, "", nil)
 	if err != nil {
 		return Player{}, err
 	}
@@ -180,12 +180,18 @@ func buildLast5StatLine(stats PlayerStats) string {
 	return last5StatLine
 }
 
-func playingToday(teamAbbrev string) (bool, error) {
+func playingToday(teamAbbrev, baseURL string, client *http.Client) (bool, error) {
+	if baseURL == "" {
+		baseURL = "https://api-web.nhle.com"
+	}
+	if client == nil {
+		client = http.DefaultClient
+	}
 	// Assemble URL
-	url := fmt.Sprintf("https://api-web.nhle.com/v1/club-schedule/%v/week/now", teamAbbrev)
+	url := fmt.Sprintf("%v/v1/club-schedule/%v/week/now", baseURL, teamAbbrev)
 
 	// Make HTTP request
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
 		return false, err
 	}
@@ -206,7 +212,7 @@ func playingToday(teamAbbrev string) (bool, error) {
 			return false, nil
 		}
 		// Compare today to game date
-		nowYear, nowMonth, nowDay := time.Now().UTC().Date()
+		nowYear, nowMonth, nowDay := time.Now().Date()
 		gameYear, gameMonth, gameDay := gameDate.Date()
 		if gameYear == nowYear && gameMonth == nowMonth && gameDay == nowDay {
 			gameCheck = true

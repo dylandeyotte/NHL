@@ -114,6 +114,7 @@ func main() {
 		Handler: mux,
 		Addr:    ":8080",
 	}
+	defer server.Close()
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
