@@ -28,6 +28,8 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 		if err != nil {
 			return nil, err
 		}
+		defer resp.Body.Close()
+
 		// Get byte data
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -73,23 +75,26 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 	return returnList, nil
 }
 
-func (cfg *apiConfig) buildPlayerHelper(i int, followedPlayer database.FollowedPlayer, output []Player, wait *sync.WaitGroup) {
+func (cfg *apiConfig) buildPlayerHelper(i int, followedPlayer database.FollowedPlayer, output []Player, wait *sync.WaitGroup, errCh chan error) {
 	// Defer counter decrease
 	defer wait.Done()
 
 	// Build stats for player
 	player, err := cfg.buildPlayerStats(followedPlayer)
 	if err != nil {
-		return // ERROR HANDLING??
+		errCh <- err
+		return
 	}
 	// Add player to output list at index
 	output[i] = player
 }
-func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPlayer) []Player {
+func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPlayer) ([]Player, error) {
 	// Create output list
 	output := make([]Player, len(playerList))
 
 	var wait sync.WaitGroup
+
+	errCh := make(chan error, len(playerList))
 
 	// Loop through player list
 	for i, followedPlayer := range playerList {
@@ -97,12 +102,20 @@ func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPla
 		wait.Add(1)
 
 		// Concurrently build list of player stats
-		go cfg.buildPlayerHelper(i, followedPlayer, output, &wait)
+		go cfg.buildPlayerHelper(i, followedPlayer, output, &wait, errCh)
 	}
-	// Wait for counter to zero
+	// Wait for counter to zero and close channel
 	wait.Wait()
+	close(errCh)
 
-	return output
+	// Loop through channel, checking for err
+	for err := range errCh {
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return output, nil
 }
 
 func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (Player, error) {
@@ -181,6 +194,7 @@ func buildLast5StatLine(stats PlayerStats) string {
 }
 
 func playingToday(teamAbbrev, baseURL string, client *http.Client) (bool, error) {
+	// Check URL and client for testing
 	if baseURL == "" {
 		baseURL = "https://api-web.nhle.com"
 	}
@@ -235,12 +249,12 @@ func respondWithJSON(w http.ResponseWriter, code int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Marshal data to JSON
-	dat, err := json.Marshal(payload)
+	data, err := json.Marshal(payload)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Marshalling error", err)
 		return
 	}
 	// Write response
 	w.WriteHeader(code)
-	w.Write(dat)
+	w.Write(data)
 }

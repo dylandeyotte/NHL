@@ -108,8 +108,6 @@ func main() {
 
 	mux.HandleFunc("POST /admin/reset", apiCfg.handlerReset)
 
-	mux.Handle("/", http.FileServer(http.Dir(".")))
-
 	server := http.Server{
 		Handler: mux,
 		Addr:    ":8080",
