@@ -28,22 +28,30 @@ SECRET = [JWT Secret]
 PLATFORM = "dev"
 ```
 - Secret can be generated with:
-`openssl rand -base64 64`
+```
+openssl rand -base64 64
+```
 
 ### Step 3
 Make migrations:
-`export DATABASE_URL=[YOUR DB_URL]`
-`make migrate`
+```
+export DATABASE_URL=[YOUR DB_URL]
+make migrate
+```
 
 Alternatively, you can run migrations with goose if you have it
 
 ### Step 4
 Load teams into the database with:
-`go run ./cmd/load_teams`
+```
+go run ./cmd/load_teams
+```
 
 ### Step 5
 Run the server
-`go run .`
+```
+go run .
+```
 
 ## Usage
 
