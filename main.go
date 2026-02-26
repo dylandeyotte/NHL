@@ -68,7 +68,7 @@ func main() {
 		log.Fatal("No secret set")
 	}
 	platform := os.Getenv("PLATFORM")
-	if secret == "" {
+	if platform == "" {
 		log.Fatal("No platform set")
 	}
 	// Create db handle
