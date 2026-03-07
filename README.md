@@ -22,7 +22,7 @@ docker run --rm -p 8080:8080 \
   -e SECRET="[JWT SECRET]" \
   -e PLATFORM="dev" \
   -e TZ="[YOUR TIMEZONE]" \
-  nhl-api
+  dylandeyotte/nhl-api
   ```
 - Secret can be generated with:
 ```

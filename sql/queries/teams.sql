@@ -7,4 +7,6 @@ VALUES (
     $2,
     $3
 )
+ON CONFLICT (id) DO UPDATE
+SET team_name = EXCLUDED.team_name, tri_code = EXCLUDED.tri_code, updated_at = NOW()
 RETURNING *;
