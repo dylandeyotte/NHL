@@ -7,12 +7,50 @@ function App() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
+  const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const response = await fetch("http://localhost:8080/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: loginEmail,
+        password: loginPassword,
+      }),
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+  };
+
+  const handleCreateUser = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const response = await fetch("http://localhost:8080/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+  };
+
   return (
     <div>
       <h1>NHL Tracker</h1>
       <h2>Existing user?</h2>
 
-      <form>
+      <form onSubmit={handleLogin}>
         <div>
           <label>Email</label>
           <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
@@ -28,7 +66,7 @@ function App() {
 
       <h2>New user?</h2>
 
-      <form>
+      <form onSubmit={handleCreateUser}>
         <div>
           <label>Email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -39,7 +77,7 @@ function App() {
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
 
-        <button type="submit">Login</button>
+        <button type="submit">Sign up</button>
       </form>
     </div>
   );
