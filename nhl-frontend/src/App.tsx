@@ -1,15 +1,13 @@
 import "./App.css";
 import { useEffect, useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
-function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-
+function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-
-  const [homeData, setHomeData] = useState(null);
 
   const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +31,7 @@ function App() {
     console.log("token stored");
     console.log(data);
 
-    setLoggedIn(true);
+    navigate("/home");
   };
 
   const handleCreateUser = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -54,6 +52,40 @@ function App() {
 
     console.log(data);
   };
+
+  return (
+    <div>
+      <h1>NHL Tracker</h1>
+      <h2>Existing user?</h2>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Email</label>
+          <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <h2>New user?</h2>
+      <form onSubmit={handleCreateUser}>
+        <div>
+          <label>Email</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <button type="submit">Sign up</button>
+      </form>
+    </div>
+  );
+}
+
+function App() {
+  const [homeData, setHomeData] = useState(null);
 
   async function newToken() {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -102,46 +134,53 @@ function App() {
     );
   }
 
-  if (loggedIn) {
-    return <Home />;
-  }
-
   return (
-    <div>
-      <h1>NHL Tracker</h1>
-      <h2>Existing user?</h2>
-
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email</label>
-          <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
-        </div>
-
-        <div>
-          <label>Password</label>
-          <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
-        </div>
-
-        <button type="submit">Login</button>
-      </form>
-
-      <h2>New user?</h2>
-
-      <form onSubmit={handleCreateUser}>
-        <div>
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </div>
-
-        <div>
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        </div>
-
-        <button type="submit">Sign up</button>
-      </form>
-    </div>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/home" element={<Home />} />
+    </Routes>
   );
+
+  // if (loggedIn) {
+  //   return <Home />;
+  // }
+
+  // return (
+  //   <div>
+  //     <h1>NHL Tracker</h1>
+  //     <h2>Existing user?</h2>
+
+  //     <form onSubmit={handleLogin}>
+  //       <div>
+  //         <label>Email</label>
+  //         <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+  //       </div>
+
+  //       <div>
+  //         <label>Password</label>
+  //         <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+  //       </div>
+
+  //       <button type="submit">Login</button>
+  //     </form>
+
+  //     <h2>New user?</h2>
+
+  //     <form onSubmit={handleCreateUser}>
+  //       <div>
+  //         <label>Email</label>
+  //         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+  //       </div>
+
+  //       <div>
+  //         <label>Password</label>
+  //         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+  //       </div>
+
+  //       <button type="submit">Sign up</button>
+  //     </form>
+  //   </div>
+  // );
 }
 
 export default App;
