@@ -28,6 +28,7 @@ function App() {
     const data = await response.json();
 
     localStorage.setItem("token", data.token);
+    localStorage.setItem("refreshToken", data.refreshToken);
 
     console.log("token stored");
     console.log(data);
@@ -54,15 +55,35 @@ function App() {
     console.log(data);
   };
 
+  async function newToken() {
+    const refreshToken = localStorage.getItem("refreshToken");
+    const response = await fetch("http://localhost:8080/api/refresh", {
+      // DEAL WITH IF REFRESH EXPIRED
+      method: "POST",
+      headers: {
+        Authorization: `Bearer: ${refreshToken}`,
+      },
+    });
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+  }
+
   function Home() {
     async function fetchPlayers() {
-      const token = localStorage.getItem("token");
-
-      const response = await fetch("http://localhost:8080/api/home", {
+      let response = await fetch("http://localhost:8080/api/home", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+
+      if (response.status === 401) {
+        newToken();
+        response = await fetch("http://localhost:8080/api/home", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+      }
       const data = await response.json();
 
       setHomeData(data);
