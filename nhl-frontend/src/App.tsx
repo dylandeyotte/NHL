@@ -131,7 +131,9 @@ async function newToken() {
 }
 
 function Home() {
+  const navigate = useNavigate();
   const [homeData, setHomeData] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   async function fetchPlayers() {
     let response = await fetch("http://localhost:8080/api/home", {
@@ -157,10 +159,17 @@ function Home() {
     fetchPlayers();
   }, []);
 
+  async function handleSearch() {
+    //
+  }
+
   return (
     <div>
       <h1>Home</h1>
-
+      <button onClick={() => navigate("/following")}>Following</button>
+      <form onSubmit={handleSearch}>
+        <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      </form>
       <pre>{JSON.stringify(homeData, null, 2)}</pre>
     </div>
   );
