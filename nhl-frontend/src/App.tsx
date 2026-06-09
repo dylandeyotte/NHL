@@ -2,6 +2,39 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
+function Following() {
+  const [following, setFollowing] = useState("");
+  async function getFollowing() {
+    let response = await fetch("http://localhost:8080/api/following", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (response.status === 401) {
+      newToken();
+      response = await fetch("http://localhost:8080/api/following", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+    }
+    const data = await response.json();
+
+    setFollowing(data);
+  }
+
+  useEffect(() => {
+    getFollowing();
+  }, []);
+
+  return (
+    <div>
+      <h1>Following</h1>
+      <pre>{JSON.stringify(following, null, 2)}</pre>
+    </div>
+  );
+}
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -84,21 +117,21 @@ function Login() {
   );
 }
 
+async function newToken() {
+  const refreshToken = localStorage.getItem("refreshToken");
+  const response = await fetch("http://localhost:8080/api/refresh", {
+    // DEAL WITH IF REFRESH EXPIRED
+    method: "POST",
+    headers: {
+      Authorization: `Bearer: ${refreshToken}`,
+    },
+  });
+  const data = await response.json();
+  localStorage.setItem("token", data.token);
+}
+
 function Home() {
   const [homeData, setHomeData] = useState(null);
-
-  async function newToken() {
-    const refreshToken = localStorage.getItem("refreshToken");
-    const response = await fetch("http://localhost:8080/api/refresh", {
-      // DEAL WITH IF REFRESH EXPIRED
-      method: "POST",
-      headers: {
-        Authorization: `Bearer: ${refreshToken}`,
-      },
-    });
-    const data = await response.json();
-    localStorage.setItem("token", data.token);
-  }
 
   async function fetchPlayers() {
     let response = await fetch("http://localhost:8080/api/home", {
@@ -137,6 +170,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/following" element={<Following />} />
       <Route path="/home" element={<Home />} />
     </Routes>
   );
