@@ -4,28 +4,14 @@ import { Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 
 function Following() {
   const [following, setFollowing] = useState("");
-  async function getFollowing() {
-    let response = await fetch("http://localhost:8080/api/following", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
 
-    if (response.status === 401) {
-      newToken();
-      response = await fetch("http://localhost:8080/api/following", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-    }
-    const data = await response.json();
-
+  async function loadFollowing() {
+    const data = await fetchHelper("http://localhost:8080/api/following");
     setFollowing(data);
   }
 
   useEffect(() => {
-    getFollowing();
+    loadFollowing();
   }, []);
 
   return (
@@ -118,6 +104,7 @@ function Login() {
 }
 
 async function newToken() {
+  // REFRESH EXPIRED CHECK
   const refreshToken = localStorage.getItem("refreshToken");
   const response = await fetch("http://localhost:8080/api/refresh", {
     method: "POST",
@@ -130,33 +117,39 @@ async function newToken() {
   console.log("new token issued");
 }
 
+async function fetchHelper(url: string) {
+  try {
+    let response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (response.status === 401) {
+      await newToken();
+      response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // CHEKC THIS
+        },
+      });
+    }
+    return response.json();
+  } catch (err) {
+    console.error(`Request failed: ${err}`);
+  }
+}
+
 function Home() {
   const navigate = useNavigate();
   const [homeData, setHomeData] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  async function fetchPlayers() {
-    let response = await fetch("http://localhost:8080/api/home", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    if (response.status === 401) {
-      await newToken();
-      response = await fetch("http://localhost:8080/api/home", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-    }
-    const data = await response.json();
-
+  async function loadHome() {
+    const data = await fetchHelper("http://localhost:8080/api/home");
     setHomeData(data);
   }
 
   useEffect(() => {
-    fetchPlayers();
+    loadHome();
   }, []);
 
   async function handleSearch() {
@@ -181,28 +174,13 @@ function Search() {
 
   const player = searchParams.get("player");
 
-  async function fetchSearched() {
-    let response = await fetch(`http://localhost:8080/api/players/search?player=${player}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    if (response.status === 401) {
-      await newToken();
-      response = await fetch(`http://localhost:8080/api/players/search?player=${player}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-    }
-    const data = await response.json();
-
+  async function loadSearch() {
+    const data = await fetchHelper(`http://localhost:8080/api/players/search?player=${player}`);
     setResults(data);
   }
 
   useEffect(() => {
-    fetchSearched();
+    loadSearch();
   }, []);
 
   return (
