@@ -40,7 +40,7 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Create JWT
-	token, err := auth.MakeJWT(user.ID, cfg.secret, 60*time.Minute)
+	token, err := auth.MakeJWT(user.ID, cfg.secret, 6*time.Second)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to create JWT", err)
 		return
@@ -123,7 +123,7 @@ func (cfg *apiConfig) handlerRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Make new JWT
-	token, err := auth.MakeJWT(user.ID, cfg.secret, 60*time.Minute)
+	token, err := auth.MakeJWT(user.ID, cfg.secret, 6*time.Second)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Error creating JWT", err)
 		return

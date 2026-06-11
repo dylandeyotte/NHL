@@ -59,7 +59,7 @@ function Login() {
     const data = await response.json();
 
     localStorage.setItem("token", data.token);
-    localStorage.setItem("refreshToken", data.refreshToken);
+    localStorage.setItem("refreshToken", data.refresh_token);
 
     console.log("token stored");
     console.log(data);
@@ -120,14 +120,14 @@ function Login() {
 async function newToken() {
   const refreshToken = localStorage.getItem("refreshToken");
   const response = await fetch("http://localhost:8080/api/refresh", {
-    // DEAL WITH IF REFRESH EXPIRED
     method: "POST",
     headers: {
-      Authorization: `Bearer: ${refreshToken}`,
+      Authorization: `Bearer ${refreshToken}`,
     },
   });
   const data = await response.json();
   localStorage.setItem("token", data.token);
+  console.log("new token issued");
 }
 
 function Home() {
@@ -143,7 +143,7 @@ function Home() {
     });
 
     if (response.status === 401) {
-      newToken();
+      await newToken();
       response = await fetch("http://localhost:8080/api/home", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -189,7 +189,7 @@ function Search() {
     });
 
     if (response.status === 401) {
-      newToken();
+      await newToken();
       response = await fetch(`http://localhost:8080/api/players/search?player=${player}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
