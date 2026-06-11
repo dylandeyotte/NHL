@@ -1,6 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 
 function Following() {
   const [following, setFollowing] = useState("");
@@ -160,7 +160,7 @@ function Home() {
   }, []);
 
   async function handleSearch() {
-    //
+    navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
   return (
@@ -175,12 +175,51 @@ function Home() {
   );
 }
 
+function Search() {
+  const [searchParams] = useSearchParams();
+  const [results, setResults] = useState([]);
+
+  const player = searchParams.get("player");
+
+  async function fetchSearched() {
+    let response = await fetch(`http://localhost:8080/api/players/search?player=${player}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (response.status === 401) {
+      newToken();
+      response = await fetch(`http://localhost:8080/api/players/search?player=${player}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+    }
+    const data = await response.json();
+
+    setResults(data);
+  }
+
+  useEffect(() => {
+    fetchSearched();
+  }, []);
+
+  return (
+    <div>
+      <h1>Search Results</h1>
+      <pre>{JSON.stringify(results, null, 2)}</pre>
+    </div>
+  );
+}
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/following" element={<Following />} />
       <Route path="/home" element={<Home />} />
+      <Route path="/search" element={<Search />} />
     </Routes>
   );
 }
