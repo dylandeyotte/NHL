@@ -6,10 +6,12 @@ function Following() {
   const [following, setFollowing] = useState("");
 
   async function loadFollowing() {
+    // HTTP request
     const data = await fetchHelper("http://localhost:8080/api/following");
     setFollowing(data);
   }
 
+  // Run effect
   useEffect(() => {
     loadFollowing();
   }, []);
@@ -31,45 +33,54 @@ function Login() {
   const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await fetch("http://localhost:8080/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: loginEmail,
-        password: loginPassword,
-      }),
-    });
+    try {
+      // HTTP request
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: loginEmail,
+          password: loginPassword,
+        }),
+      });
 
-    const data = await response.json();
+      // Store tokens
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("refreshToken", data.refresh_token);
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("refreshToken", data.refresh_token);
-
-    console.log("token stored");
-    console.log(data);
-
-    navigate("/home");
+      console.log("token stored");
+      navigate("/home");
+    } catch (err) {
+      console.error(`Request failed: ${err}`);
+      throw err;
+    }
   };
 
   const handleCreateUser = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await fetch("http://localhost:8080/api/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    });
+    try {
+      // HTTP request
+      const response = await fetch("http://localhost:8080/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
 
-    const data = await response.json();
-
-    console.log(data);
+      const data = await response.json();
+      console.log(data);
+    } catch (err) {
+      console.error(`Request failed" ${err}`);
+      throw err;
+    }
   };
 
   return (
@@ -104,26 +115,39 @@ function Login() {
 }
 
 async function newToken() {
-  // REFRESH EXPIRED CHECK
-  const refreshToken = localStorage.getItem("refreshToken");
-  const response = await fetch("http://localhost:8080/api/refresh", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${refreshToken}`,
-    },
-  });
-  const data = await response.json();
-  localStorage.setItem("token", data.token);
+  const navigate = useNavigate();
+
+  try {
+    // HTTP request
+    const response = await fetch("http://localhost:8080/api/refresh", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
+      },
+    });
+    // Check if token expired
+    if (response.status === 401) {
+      navigate("/");
+    }
+    // Store new token
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+  } catch (err) {
+    console.error(`Request failed: ${err}`);
+    throw err;
+  }
   console.log("new token issued");
 }
 
 async function fetchHelper(url: string) {
   try {
+    // HTTP request
     let response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+    // If failed, get new token and request again
     if (response.status === 401) {
       await newToken();
       response = await fetch(url, {
@@ -135,6 +159,7 @@ async function fetchHelper(url: string) {
     return response.json();
   } catch (err) {
     console.error(`Request failed: ${err}`);
+    throw err;
   }
 }
 
@@ -144,10 +169,12 @@ function Home() {
   const [searchTerm, setSearchTerm] = useState("");
 
   async function loadHome() {
+    // HTTP request
     const data = await fetchHelper("http://localhost:8080/api/home");
     setHomeData(data);
   }
 
+  // Run effect
   useEffect(() => {
     loadHome();
   }, []);
@@ -170,23 +197,58 @@ function Home() {
 
 function Search() {
   const [searchParams] = useSearchParams();
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<searchedPlayer[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
+  type searchedPlayer = {
+    playerId: string;
+    name: string;
+    positionCode: string;
+    teamAbbrev: string;
+    height: string;
+    weightInPounds: number;
+    birthCountry: string;
+  };
+
+  // Get search parameter that user typed
   const player = searchParams.get("player");
 
   async function loadSearch() {
+    // HTTP request
     const data = await fetchHelper(`http://localhost:8080/api/players/search?player=${player}`);
     setResults(data);
   }
 
+  // Run effect
   useEffect(() => {
     loadSearch();
-  }, []);
+  }, [player]);
+
+  async function handleSearch(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
+    navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
+  }
 
   return (
     <div>
       <h1>Search Results</h1>
-      <pre>{JSON.stringify(results, null, 2)}</pre>
+      <form onSubmit={handleSearch}>
+        <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      </form>
+      <pre>
+        {results.map((player) => (
+          <div key={player.playerId}>
+            <div>{player.name}</div>
+            <div>{player.teamAbbrev}</div>
+            <div>{player.positionCode}</div>
+            <div>{player.height}</div>
+            <div>{player.weightInPounds}</div>
+            <div>{player.birthCountry}</div>
+            <button>Follow</button>
+          </div>
+        ))}
+      </pre>
     </div>
   );
 }
