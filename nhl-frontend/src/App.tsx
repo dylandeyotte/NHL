@@ -139,10 +139,11 @@ async function newToken() {
   console.log("new token issued");
 }
 
-async function fetchHelper(url: string) {
+async function fetchHelper(url: string, options?: string) {
   try {
     // HTTP request
     let response = await fetch(url, {
+      method: options,
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -151,6 +152,7 @@ async function fetchHelper(url: string) {
     if (response.status === 401) {
       await newToken();
       response = await fetch(url, {
+        method: options,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // CHEKC THIS
         },
@@ -199,6 +201,7 @@ function Search() {
   const [searchParams] = useSearchParams();
   const [results, setResults] = useState<searchedPlayer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [followed, setFollowed] = useState<string[]>([]);
   const navigate = useNavigate();
 
   type searchedPlayer = {
@@ -230,9 +233,19 @@ function Search() {
     navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
+  async function handleFollow(id: string) {
+    // HTTP request
+    const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "POST");
+
+    console.log(data);
+    console.log("player followed");
+    setFollowed([...followed, id]); // LOOK INTO THIS
+  }
+
   return (
     <div>
       <h1>Search Results</h1>
+      <button onClick={() => navigate("/home")}>Home</button>
       <form onSubmit={handleSearch}>
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>
@@ -245,7 +258,7 @@ function Search() {
             <div>{player.height}</div>
             <div>{player.weightInPounds}</div>
             <div>{player.birthCountry}</div>
-            <button>Follow</button>
+            <button onClick={() => handleFollow(player.playerId)}>{followed.includes(player.playerId) ? "Following" : "Follow"}</button>
           </div>
         ))}
       </pre>
