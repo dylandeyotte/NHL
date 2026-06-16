@@ -6,10 +6,10 @@ type playerStats = {
   name: string;
   games_played: number;
   goals: number;
-  assits: number;
+  assists: number;
   points: number;
   "p/gp": string;
-  last_5_games_total: string;
+  last_5_games_totals: string;
   playing_today: boolean;
 };
 
@@ -232,13 +232,13 @@ async function fetchHelper(url: string, options?: string) {
 
 function Home() {
   const navigate = useNavigate();
-  const [homeData, setHomeData] = useState(null);
+  const [homeData, setHomeData] = useState<playerStats[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   async function loadHome() {
     // HTTP request
     const data = await fetchHelper("http://localhost:8080/api/home");
-    setHomeData(data);
+    setHomeData(data.players);
   }
 
   // Run effect
@@ -257,7 +257,20 @@ function Home() {
       <form onSubmit={handleSearch}>
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>
-      <pre>{JSON.stringify(homeData, null, 2)}</pre>
+      <pre>
+        {homeData.map((player) => (
+          <div key={player.name}>
+            <h3>{player.name}</h3>
+            <div>Games: {player.games_played}</div>
+            <div>Goals: {player.goals}</div>
+            <div>Assits: {player.assists}</div>
+            <div>Points: {player.points}</div>
+            <div>P/PG: {player["p/gp"]}</div>
+            <div>Last 5: {player.last_5_games_totals}</div>
+            <div>Playing today: {String(player.playing_today)}</div>
+          </div>
+        ))}
+      </pre>
     </div>
   );
 }
