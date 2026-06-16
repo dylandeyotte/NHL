@@ -2,13 +2,49 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 
+type playerStats = {
+  name: string;
+  games_played: number;
+  goals: number;
+  assits: number;
+  points: number;
+  "p/gp": string;
+  last_5_games_total: string;
+  playing_today: boolean;
+};
+
+async function handleUnfollowPlayer(id: number) {
+  const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "DELETE");
+
+  console.log(data);
+}
+
+async function handleUnfollowTeam(tricode: string) {
+  const data = await fetchHelper(`http://localhost:8080/api/teams/${tricode}/follow`, "DELETE");
+
+  console.log(data);
+}
+
 function Following() {
-  const [following, setFollowing] = useState("");
+  const [following, setFollowing] = useState<followee[]>([]);
+  const [team, setTeam] = useState<followedTeam>();
+  const navigate = useNavigate();
+
+  type followee = {
+    PlayerName: string;
+    PlayerID: number;
+  };
+
+  type followedTeam = {
+    TeamName: string;
+    TriCode: string;
+  };
 
   async function loadFollowing() {
     // HTTP request
     const data = await fetchHelper("http://localhost:8080/api/following");
-    setFollowing(data);
+    setFollowing(data.players);
+    setTeam(data.team);
   }
 
   // Run effect
@@ -16,10 +52,39 @@ function Following() {
     loadFollowing();
   }, []);
 
+  if (team?.TeamName === "" || team?.TriCode == "" || !team) {
+    return (
+      <div>
+        <h1>Following</h1>
+        <button onClick={() => navigate("/home")}>Home</button>
+        <pre>
+          {following.map((player) => (
+            <div key={player.PlayerID}>
+              <h3>{player.PlayerName}</h3>
+              <button onClick={() => handleUnfollowPlayer(player.PlayerID)}>Unfollow</button>
+            </div>
+          ))}
+        </pre>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1>Following</h1>
-      <pre>{JSON.stringify(following, null, 2)}</pre>
+      <button onClick={() => navigate("/home")}>Home</button>
+      <pre>
+        <h3>{team.TeamName}</h3>
+        <button onClick={() => handleUnfollowTeam(team.TriCode)}>Unfollow</button>
+      </pre>
+      <pre>
+        {following.map((player) => (
+          <div key={player.PlayerID}>
+            <h3>{player.PlayerName}</h3>
+            <button onClick={() => handleUnfollowPlayer(player.PlayerID)}>Unfollow</button>
+          </div>
+        ))}
+      </pre>
     </div>
   );
 }

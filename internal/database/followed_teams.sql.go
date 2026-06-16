@@ -39,32 +39,40 @@ func (q *Queries) FetchTeamByTriCode(ctx context.Context, triCode string) (Team,
 }
 
 const followTeam = `-- name: FollowTeam :one
-INSERT INTO followed_teams(id, created_at, updated_at, team_name, user_id, team_id)
+INSERT INTO followed_teams(id, created_at, updated_at, team_name, tri_code, user_id, team_id)
 VALUES (
     gen_random_uuid(),
     NOW(),
     NOW(),
     $1,
     $2,
-    $3
+    $3,
+    $4
 )
-RETURNING id, created_at, updated_at, team_name, user_id, team_id
+RETURNING id, created_at, updated_at, team_name, tri_code, user_id, team_id
 `
 
 type FollowTeamParams struct {
 	TeamName string
+	TriCode  string
 	UserID   uuid.UUID
 	TeamID   int32
 }
 
 func (q *Queries) FollowTeam(ctx context.Context, arg FollowTeamParams) (FollowedTeam, error) {
-	row := q.db.QueryRowContext(ctx, followTeam, arg.TeamName, arg.UserID, arg.TeamID)
+	row := q.db.QueryRowContext(ctx, followTeam,
+		arg.TeamName,
+		arg.TriCode,
+		arg.UserID,
+		arg.TeamID,
+	)
 	var i FollowedTeam
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.TeamName,
+		&i.TriCode,
 		&i.UserID,
 		&i.TeamID,
 	)
@@ -72,7 +80,7 @@ func (q *Queries) FollowTeam(ctx context.Context, arg FollowTeamParams) (Followe
 }
 
 const getFollowedTeam = `-- name: GetFollowedTeam :one
-SELECT id, created_at, updated_at, team_name, user_id, team_id FROM followed_teams
+SELECT id, created_at, updated_at, team_name, tri_code, user_id, team_id FROM followed_teams
 WHERE user_id = $1
 `
 
@@ -84,6 +92,7 @@ func (q *Queries) GetFollowedTeam(ctx context.Context, userID uuid.UUID) (Follow
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.TeamName,
+		&i.TriCode,
 		&i.UserID,
 		&i.TeamID,
 	)

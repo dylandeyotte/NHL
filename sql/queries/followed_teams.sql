@@ -1,12 +1,13 @@
 -- name: FollowTeam :one
-INSERT INTO followed_teams(id, created_at, updated_at, team_name, user_id, team_id)
+INSERT INTO followed_teams(id, created_at, updated_at, team_name, tri_code, user_id, team_id)
 VALUES (
     gen_random_uuid(),
     NOW(),
     NOW(),
     $1,
     $2,
-    $3
+    $3,
+    $4
 )
 RETURNING *;
 

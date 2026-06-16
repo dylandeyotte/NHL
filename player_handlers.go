@@ -92,11 +92,6 @@ func (cfg *apiConfig) handlerGetFollows(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
-	// Build player list of names
-	returnPlayerList := []string{}
-	for _, player := range playerList {
-		returnPlayerList = append(returnPlayerList, player.PlayerName)
-	}
 	// Get followed team
 	followedTeam, err := cfg.database.GetFollowedTeam(r.Context(), userID)
 	if err != nil {
@@ -107,12 +102,12 @@ func (cfg *apiConfig) handlerGetFollows(w http.ResponseWriter, r *http.Request) 
 	}
 	// Build JSON payload for return
 	type JSONData struct {
-		Team    string   `json:"team"`
-		Players []string `json:"players"`
+		Team    database.FollowedTeam   `json:"team"`
+		Players []database.FollowedPlayer `json:"players"`
 	}
 	payload := JSONData{
-		Team:    followedTeam.TeamName,
-		Players: returnPlayerList,
+		Team:    followedTeam,
+		Players: playerList,
 	}
 	// Respond with JSON
 	respondWithJSON(w, http.StatusOK, payload)

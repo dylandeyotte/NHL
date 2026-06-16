@@ -4,6 +4,7 @@ CREATE TABLE followed_teams(
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     team_name TEXT NOT NULL,
+    tri_code TEXT NOT NULL,
     user_id UUID UNIQUE NOT NULL,
     team_id INT NOT NULL,
     FOREIGN KEY (user_id)

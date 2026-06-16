@@ -34,6 +34,7 @@ func (cfg *apiConfig) handlerFollowTeam(w http.ResponseWriter, r *http.Request) 
 		TeamName: team.TeamName,
 		UserID:   userID,
 		TeamID:   team.ID,
+		TriCode: 	triCode,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Error following team", err)

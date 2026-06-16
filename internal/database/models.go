@@ -25,6 +25,7 @@ type FollowedTeam struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	TeamName  string
+	TriCode   string
 	UserID    uuid.UUID
 	TeamID    int32
 }
