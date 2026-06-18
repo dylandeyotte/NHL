@@ -2,6 +2,41 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 
+const teamList = [
+  { name: "Anaheim Ducks", tricode: "ANA" },
+  { name: "Boston Bruins", tricode: "BOS" },
+  { name: "Buffalo Sabres", tricode: "BUF" },
+  { name: "Calgary Flames", tricode: "CGY" },
+  { name: "Carolina Hurricanes", tricode: "CAR" },
+  { name: "Chicago Blackhawks", tricode: "CHI" },
+  { name: "Colorado Avalanche", tricode: "COL" },
+  { name: "Columbus Blue Jackets", tricode: "CBJ" },
+  { name: "Dallas Stars", tricode: "DAL" },
+  { name: "Detroit Red Wings", tricode: "DET" },
+  { name: "Edmonton Oilers", tricode: "EDM" },
+  { name: "Florida Panthers", tricode: "FLA" },
+  { name: "Los Angeles Kings", tricode: "LAK" },
+  { name: "Minnesota Wild", tricode: "MIN" },
+  { name: "Montréal Canadiens", tricode: "MTL" },
+  { name: "Nashville Predators", tricode: "NSH" },
+  { name: "New Jersey Devils", tricode: "NJD" },
+  { name: "New York Islanders", tricode: "NYI" },
+  { name: "New York Rangers", tricode: "NYR" },
+  { name: "Ottawa Senators", tricode: "OTT" },
+  { name: "Philadelphia Flyers", tricode: "PHI" },
+  { name: "Pittsburgh Penguins", tricode: "PIT" },
+  { name: "San Jose Sharks", tricode: "SJS" },
+  { name: "Seattle Kraken", tricode: "SEA" },
+  { name: "St. Louis Blues", tricode: "STL" },
+  { name: "Tampa Bay Lightning", tricode: "TBL" },
+  { name: "Toronto Maple Leafs", tricode: "TOR" },
+  { name: "Utah Mammoth", tricode: "UTA" },
+  { name: "Vancouver Canucks", tricode: "VAN" },
+  { name: "Vegas Golden Knights", tricode: "VGK" },
+  { name: "Washington Capitals", tricode: "WSH" },
+  { name: "Winnipeg Jets", tricode: "WPG" },
+];
+
 type playerStats = {
   name: string;
   games_played: number;
@@ -13,16 +48,49 @@ type playerStats = {
   playing_today: boolean;
 };
 
+async function handleFollow(id: string) {
+  const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "POST");
+
+  console.log(data);
+  console.log(`Player followed: ${id}`);
+}
+
 async function handleUnfollowPlayer(id: number) {
   const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "DELETE");
 
   console.log(data);
+  console.log(`Player unfollowed: ${id}`);
+}
+
+async function handleFollowTeam(tricode: string) {
+  const data = await fetchHelper(`http://localhost:8080/api/teams/${tricode}/follow`, "POST");
+
+  console.log(data);
+  console.log(`Team followd: ${tricode}`);
 }
 
 async function handleUnfollowTeam(tricode: string) {
   const data = await fetchHelper(`http://localhost:8080/api/teams/${tricode}/follow`, "DELETE");
 
   console.log(data);
+  console.log(`Team unfollowd: ${tricode}`);
+}
+
+function Teams() {
+  const navigate = useNavigate();
+  return (
+    <div>
+      <button onClick={() => navigate("/home")}>Home</button>
+      <pre>
+        {teamList.map((team) => (
+          <div key={team.name}>
+            <h3>{team.name}</h3>
+            <button onClick={() => handleFollowTeam(team.tricode)}>Follow</button>
+          </div>
+        ))}
+      </pre>
+    </div>
+  );
 }
 
 function Following() {
@@ -42,9 +110,16 @@ function Following() {
 
   async function loadFollowing() {
     // HTTP request
-    const data = await fetchHelper("http://localhost:8080/api/following");
-    setFollowing(data.players);
-    setTeam(data.team);
+    try {
+      const data = await fetchHelper("http://localhost:8080/api/following");
+
+      setFollowing(data.players);
+      setTeam(data.team);
+    } catch (err) {
+      if (err instanceof Error && err.message === "REFRESH_EXPIRED") {
+        navigate("/");
+      }
+    }
   }
 
   // Run effect
@@ -180,8 +255,6 @@ function Login() {
 }
 
 async function newToken() {
-  const navigate = useNavigate();
-
   try {
     // HTTP request
     const response = await fetch("http://localhost:8080/api/refresh", {
@@ -190,9 +263,9 @@ async function newToken() {
         Authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
       },
     });
-    // Check if token expired
+    // Check if refresh token expired
     if (response.status === 401) {
-      navigate("/");
+      return false;
     }
     // Store new token
     const data = await response.json();
@@ -202,6 +275,7 @@ async function newToken() {
     throw err;
   }
   console.log("new token issued");
+  return true;
 }
 
 async function fetchHelper(url: string, options?: string) {
@@ -215,7 +289,12 @@ async function fetchHelper(url: string, options?: string) {
     });
     // If failed, get new token and request again
     if (response.status === 401) {
-      await newToken();
+      // Check if refresh token is expired
+      const success = await newToken();
+      if (!success) {
+        throw new Error("REFRESH_EXPIRED");
+      }
+      // HTTP request again
       response = await fetch(url, {
         method: options,
         headers: {
@@ -253,6 +332,7 @@ function Home() {
   return (
     <div>
       <h1>Home</h1>
+      <button onClick={() => navigate("/teams")}>Teams</button>
       <button onClick={() => navigate("/following")}>Following</button>
       <form onSubmit={handleSearch}>
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
@@ -279,7 +359,6 @@ function Search() {
   const [searchParams] = useSearchParams();
   const [results, setResults] = useState<searchedPlayer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [followed, setFollowed] = useState<string[]>([]);
   const navigate = useNavigate();
 
   type searchedPlayer = {
@@ -311,15 +390,6 @@ function Search() {
     navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
-  async function handleFollow(id: string) {
-    // HTTP request
-    const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "POST");
-
-    console.log(data);
-    console.log("player followed");
-    setFollowed([...followed, id]); // LOOK INTO THIS
-  }
-
   return (
     <div>
       <h1>Search Results</h1>
@@ -336,7 +406,7 @@ function Search() {
             <div>{player.height}</div>
             <div>{player.weightInPounds}</div>
             <div>{player.birthCountry}</div>
-            <button onClick={() => handleFollow(player.playerId)}>{followed.includes(player.playerId) ? "Following" : "Follow"}</button>
+            <button onClick={() => handleFollow(player.playerId)}>Follow</button>
           </div>
         ))}
       </pre>
@@ -351,6 +421,7 @@ function App() {
       <Route path="/following" element={<Following />} />
       <Route path="/home" element={<Home />} />
       <Route path="/search" element={<Search />} />
+      <Route path="/teams" element={<Teams />} />
     </Routes>
   );
 }
