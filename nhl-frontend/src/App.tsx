@@ -165,6 +165,7 @@ function Following() {
 }
 function Login() {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginEmail, setLoginEmail] = useState("");
@@ -185,6 +186,11 @@ function Login() {
           password: loginPassword,
         }),
       });
+
+      if (response.status === 400 || response.status === 401) {
+        setError("Incorrect email or password");
+        return;
+      }
 
       // Store tokens
       const data = await response.json();
@@ -235,6 +241,7 @@ function Login() {
         <div>
           <label>Password</label>
           <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+          {error && <p>{error}</p>}
         </div>
         <button type="submit">Login</button>
       </form>
@@ -298,7 +305,7 @@ async function fetchHelper(url: string, options?: string) {
       response = await fetch(url, {
         method: options,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // CHEKC THIS
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
     }
@@ -369,6 +376,7 @@ function Search() {
     height: string;
     weightInPounds: number;
     birthCountry: string;
+    isFollowed: boolean;
   };
 
   // Get search parameter that user typed
@@ -406,7 +414,7 @@ function Search() {
             <div>{player.height}</div>
             <div>{player.weightInPounds}</div>
             <div>{player.birthCountry}</div>
-            <button onClick={() => handleFollow(player.playerId)}>Follow</button>
+            <button onClick={() => handleFollow(player.playerId)}>{player.isFollowed ? "Unfollow" : "Follow"}</button>
           </div>
         ))}
       </pre>

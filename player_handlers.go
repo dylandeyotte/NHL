@@ -102,7 +102,7 @@ func (cfg *apiConfig) handlerGetFollows(w http.ResponseWriter, r *http.Request) 
 	}
 	// Build JSON payload for return
 	type JSONData struct {
-		Team    database.FollowedTeam   `json:"team"`
+		Team    database.FollowedTeam     `json:"team"`
 		Players []database.FollowedPlayer `json:"players"`
 	}
 	payload := JSONData{
@@ -114,6 +114,18 @@ func (cfg *apiConfig) handlerGetFollows(w http.ResponseWriter, r *http.Request) 
 }
 
 func (cfg *apiConfig) handlerSearchPlayers(w http.ResponseWriter, r *http.Request) {
+	// Get token
+	tokenString, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Could not retreive token", err)
+		return
+	}
+	// Validate token
+	userID, err := auth.ValidateJWT(tokenString, cfg.secret)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Could not validate token", err)
+		return
+	}
 	// Get name and limit from query
 	name := r.URL.Query().Get("player")
 	limit := r.URL.Query().Get("limit")
@@ -137,12 +149,37 @@ func (cfg *apiConfig) handlerSearchPlayers(w http.ResponseWriter, r *http.Reques
 	}
 	defer resp.Body.Close()
 
+	// Get list of followed players
+	playerList, err := cfg.database.GetFollowedPlayers(r.Context(), userID)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			respondWithError(w, http.StatusInternalServerError, "Error finding followed team", err)
+			return
+		}
+	}
+	// Make map of followed player
+	followedMap := make(map[int]bool)
+
+	// Fill map with players followed
+	for _, player := range playerList {
+		followedMap[int(player.PlayerID)] = true
+	}
+
 	// Decode JSON
 	psr := PlayerSearchResults{}
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&psr); err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Error decoding JSON", err)
 		return
+	}
+	// Add search results to map
+	for i := range psr {
+		playerIDInt, err := strconv.Atoi(psr[i].PlayerID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Error converting string to int", err)
+			return
+		}
+		psr[i].IsFollowed = followedMap[playerIDInt]
 	}
 	// Respond with JSON
 	respondWithJSON(w, http.StatusOK, psr)
