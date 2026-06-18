@@ -48,14 +48,14 @@ type playerStats = {
   playing_today: boolean;
 };
 
-async function handleFollow(id: string) {
+async function handleFollowPlayer(id: string) {
   const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "POST");
 
   console.log(data);
   console.log(`Player followed: ${id}`);
 }
 
-async function handleUnfollowPlayer(id: number) {
+async function handleUnfollowPlayer(id: string) {
   const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "DELETE");
 
   console.log(data);
@@ -136,14 +136,14 @@ function Following() {
           {following.map((player) => (
             <div key={player.PlayerID}>
               <h3>{player.PlayerName}</h3>
-              <button onClick={() => handleUnfollowPlayer(player.PlayerID)}>Unfollow</button>
+              <button onClick={() => handleUnfollowPlayer(player.PlayerID.toString())}>Unfollow</button>
             </div>
           ))}
         </pre>
       </div>
     );
   }
-
+  // NEED TO FIX THIS AND IMPLEMENT UNFOLLOW
   return (
     <div>
       <h1>Following</h1>
@@ -156,7 +156,7 @@ function Following() {
         {following.map((player) => (
           <div key={player.PlayerID}>
             <h3>{player.PlayerName}</h3>
-            <button onClick={() => handleUnfollowPlayer(player.PlayerID)}>Unfollow</button>
+            <button onClick={() => handleUnfollowPlayer(player.PlayerID.toString())}>Unfollow</button>
           </div>
         ))}
       </pre>
@@ -414,7 +414,9 @@ function Search() {
             <div>{player.height}</div>
             <div>{player.weightInPounds}</div>
             <div>{player.birthCountry}</div>
-            <button onClick={() => handleFollow(player.playerId)}>{player.isFollowed ? "Unfollow" : "Follow"}</button>
+            <button onClick={() => (player.isFollowed ? handleUnfollowPlayer(player.playerId) : handleFollowPlayer(player.playerId))}>
+              {player.isFollowed ? "Unfollow" : "Follow"} // NEED TO FLIP BUTTON ON CLICK
+            </button>
           </div>
         ))}
       </pre>
