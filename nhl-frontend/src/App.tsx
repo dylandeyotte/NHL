@@ -52,7 +52,7 @@ async function handleFollowPlayer(id: string) {
   const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "POST");
 
   console.log(data);
-  console.log(`Player followed: ${id}`);
+  console.log(`Player followed: ${data.PlayerID}`);
 }
 
 async function handleUnfollowPlayer(id: string) {
@@ -66,7 +66,7 @@ async function handleFollowTeam(tricode: string) {
   const data = await fetchHelper(`http://localhost:8080/api/teams/${tricode}/follow`, "POST");
 
   console.log(data);
-  console.log(`Team followd: ${tricode}`);
+  console.log(`Team followd: ${data.TriCode}`);
 }
 
 async function handleUnfollowTeam(tricode: string) {
@@ -78,6 +78,24 @@ async function handleUnfollowTeam(tricode: string) {
 
 function Teams() {
   const navigate = useNavigate();
+  const [followedTeam, setFollowedTeam] = useState();
+
+  async function fetchTeam() {
+    const data = await fetchHelper("http://localhost:8080/api/following");
+    setFollowedTeam(data.team);
+  }
+
+  async function handleFollowClick(tricode: string) {
+    // FIX ALL THIS
+    await handleFollowTeam(tricode);
+    fetchTeam();
+  }
+
+  async function handleUnfollowClick(tricode: string) {
+    await handleUnfollowTeam(tricode);
+    fetchTeam();
+  }
+
   return (
     <div>
       <button onClick={() => navigate("/home")}>Home</button>
@@ -85,7 +103,11 @@ function Teams() {
         {teamList.map((team) => (
           <div key={team.name}>
             <h3>{team.name}</h3>
-            <button onClick={() => handleFollowTeam(team.tricode)}>Follow</button>
+            <button
+              onClick={() => (followedTeam?.TriCode === team.tricode ? handleUnfollowClick(team.tricode) : handleFollowClick(team.tricode))}
+            >
+              {followedTeam?.TriCode === team.tricode ? "Unfollow" : "Follow"}
+            </button>
           </div>
         ))}
       </pre>
@@ -127,6 +149,16 @@ function Following() {
     loadFollowing();
   }, []);
 
+  async function handleUnfollowPlayerClick(id: number) {
+    await handleUnfollowPlayer(id.toString());
+    loadFollowing();
+  }
+
+  async function handleUnfollowTeamClick(tricode: string) {
+    await handleUnfollowTeam(tricode);
+    loadFollowing();
+  }
+
   if (team?.TeamName === "" || team?.TriCode == "" || !team) {
     return (
       <div>
@@ -136,27 +168,27 @@ function Following() {
           {following.map((player) => (
             <div key={player.PlayerID}>
               <h3>{player.PlayerName}</h3>
-              <button onClick={() => handleUnfollowPlayer(player.PlayerID.toString())}>Unfollow</button>
+              <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
             </div>
           ))}
         </pre>
       </div>
     );
   }
-  // NEED TO FIX THIS AND IMPLEMENT UNFOLLOW
+  // CONSOLIDATE
   return (
     <div>
       <h1>Following</h1>
       <button onClick={() => navigate("/home")}>Home</button>
       <pre>
         <h3>{team.TeamName}</h3>
-        <button onClick={() => handleUnfollowTeam(team.TriCode)}>Unfollow</button>
+        <button onClick={() => handleUnfollowTeamClick(team.TriCode)}>Unfollow</button>
       </pre>
       <pre>
         {following.map((player) => (
           <div key={player.PlayerID}>
             <h3>{player.PlayerName}</h3>
-            <button onClick={() => handleUnfollowPlayer(player.PlayerID.toString())}>Unfollow</button>
+            <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
           </div>
         ))}
       </pre>
@@ -398,6 +430,16 @@ function Search() {
     navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
+  async function handleFollowClick(id: string) {
+    await handleFollowPlayer(id);
+    loadSearch();
+  }
+
+  async function handleUnfollowClick(id: string) {
+    await handleUnfollowPlayer(id);
+    loadSearch();
+  }
+
   return (
     <div>
       <h1>Search Results</h1>
@@ -414,8 +456,8 @@ function Search() {
             <div>{player.height}</div>
             <div>{player.weightInPounds}</div>
             <div>{player.birthCountry}</div>
-            <button onClick={() => (player.isFollowed ? handleUnfollowPlayer(player.playerId) : handleFollowPlayer(player.playerId))}>
-              {player.isFollowed ? "Unfollow" : "Follow"} // NEED TO FLIP BUTTON ON CLICK
+            <button onClick={() => (player.isFollowed ? handleUnfollowClick(player.playerId) : handleFollowClick(player.playerId))}>
+              {player.isFollowed ? "Unfollow" : "Follow"}
             </button>
           </div>
         ))}
