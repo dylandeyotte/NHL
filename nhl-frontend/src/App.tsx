@@ -48,6 +48,19 @@ type playerStats = {
   playing_today: boolean;
 };
 
+type teamStandings = {
+  name: string;
+  games_played: number;
+  wins: number;
+  losses: number;
+  otl: number;
+  points: number;
+  rw: number;
+  row: number;
+  goal_differential: number;
+  last_10: string;
+};
+
 async function handleFollowPlayer(id: string) {
   const data = await fetchHelper(`http://localhost:8080/api/players/${id}/follow`, "POST");
 
@@ -82,11 +95,10 @@ function Teams() {
 
   async function fetchTeam() {
     const data = await fetchHelper("http://localhost:8080/api/following");
-    setFollowedTeam(data.team);
+    setFollowedTeam(data.team.TriCode);
   }
 
   async function handleFollowClick(tricode: string) {
-    // FIX ALL THIS
     await handleFollowTeam(tricode);
     fetchTeam();
   }
@@ -96,6 +108,10 @@ function Teams() {
     fetchTeam();
   }
 
+  useEffect(() => {
+    fetchTeam();
+  }, []);
+
   return (
     <div>
       <button onClick={() => navigate("/home")}>Home</button>
@@ -103,10 +119,8 @@ function Teams() {
         {teamList.map((team) => (
           <div key={team.name}>
             <h3>{team.name}</h3>
-            <button
-              onClick={() => (followedTeam?.TriCode === team.tricode ? handleUnfollowClick(team.tricode) : handleFollowClick(team.tricode))}
-            >
-              {followedTeam?.TriCode === team.tricode ? "Unfollow" : "Follow"}
+            <button onClick={() => (followedTeam === team.tricode ? handleUnfollowClick(team.tricode) : handleFollowClick(team.tricode))}>
+              {followedTeam === team.tricode ? "Unfollow" : "Follow"}
             </button>
           </div>
         ))}
@@ -352,11 +366,13 @@ function Home() {
   const navigate = useNavigate();
   const [homeData, setHomeData] = useState<playerStats[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [standings, setStandings] = useState<teamStandings[]>([]);
 
   async function loadHome() {
     // HTTP request
     const data = await fetchHelper("http://localhost:8080/api/home");
     setHomeData(data.players);
+    setStandings(data.standings);
   }
 
   // Run effect
@@ -369,6 +385,7 @@ function Home() {
   }
 
   return (
+    // HIGHLIGHT FOLLOWED TEAM
     <div>
       <h1>Home</h1>
       <button onClick={() => navigate("/teams")}>Teams</button>
@@ -377,6 +394,20 @@ function Home() {
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>
       <pre>
+        <h3>Division</h3>
+        {standings.map((team) => (
+          <div key={team.name}>
+            <div>{team.name}</div>
+            <div>{team.games_played}</div>
+            <div>{team.wins}</div>
+            <div>{team.losses}</div>
+            <div>{team.otl}</div>
+            <div>{team.rw}</div>
+            <div>{team.row}</div>
+            <div>{team.goal_differential}</div>
+            <div>{team.last_10}</div>
+          </div>
+        ))}
         {homeData.map((player) => (
           <div key={player.name}>
             <h3>{player.name}</h3>
