@@ -92,6 +92,7 @@ async function handleUnfollowTeam(tricode: string) {
 function Teams() {
   const navigate = useNavigate();
   const [followedTeam, setFollowedTeam] = useState();
+  const [error, setError] = useState("");
 
   async function fetchTeam() {
     const data = await fetchHelper("http://localhost:8080/api/following");
@@ -99,6 +100,10 @@ function Teams() {
   }
 
   async function handleFollowClick(tricode: string) {
+    if (followedTeam !== tricode && followedTeam !== "") {
+      setError("Only one team may be followed");
+      return;
+    }
     await handleFollowTeam(tricode);
     fetchTeam();
   }
@@ -106,6 +111,7 @@ function Teams() {
   async function handleUnfollowClick(tricode: string) {
     await handleUnfollowTeam(tricode);
     fetchTeam();
+    setError("");
   }
 
   useEffect(() => {
@@ -115,6 +121,7 @@ function Teams() {
   return (
     <div>
       <button onClick={() => navigate("/home")}>Home</button>
+      {error && <p>{error}</p>}
       <pre>
         {teamList.map((team) => (
           <div key={team.name}>
@@ -168,43 +175,40 @@ function Following() {
     loadFollowing();
   }
 
-  async function handleUnfollowTeamClick(tricode: string) {
+  async function handleUnfollowTeamClick(tricode: string | undefined) {
+    if (tricode === undefined) {
+      throw new Error("Undefined tricode");
+    }
     await handleUnfollowTeam(tricode);
     loadFollowing();
   }
 
-  if (team?.TeamName === "" || team?.TriCode == "" || !team) {
+  if (team?.TeamName === "" && !following) {
     return (
       <div>
         <h1>Following</h1>
         <button onClick={() => navigate("/home")}>Home</button>
-        <pre>
-          {following.map((player) => (
-            <div key={player.PlayerID}>
-              <h3>{player.PlayerName}</h3>
-              <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
-            </div>
-          ))}
-        </pre>
+        <h3>None</h3>
       </div>
     );
   }
-  // CONSOLIDATE
+
   return (
     <div>
       <h1>Following</h1>
       <button onClick={() => navigate("/home")}>Home</button>
       <pre>
-        <h3>{team.TeamName}</h3>
-        <button onClick={() => handleUnfollowTeamClick(team.TriCode)}>Unfollow</button>
+        <h3>{team?.TeamName}</h3>
+        {team?.TeamName && <button onClick={() => handleUnfollowTeamClick(team?.TriCode)}>Unfollow</button>}
       </pre>
       <pre>
-        {following.map((player) => (
-          <div key={player.PlayerID}>
-            <h3>{player.PlayerName}</h3>
-            <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
-          </div>
-        ))}
+        {following &&
+          following.map((player) => (
+            <div key={player.PlayerID}>
+              <h3>{player.PlayerName}</h3>
+              <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
+            </div>
+          ))}
       </pre>
     </div>
   );
@@ -384,6 +388,20 @@ function Home() {
     navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
+  if (standings.length === 0 && homeData.length === 0) {
+    return (
+      <div>
+        <h1>Home</h1>
+        <button onClick={() => navigate("/teams")}>Teams</button>
+        <button onClick={() => navigate("/following")}>Following</button>
+        <form onSubmit={handleSearch}>
+          <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </form>
+        <h3>Follow some players!</h3>
+      </div>
+    );
+  }
+
   return (
     // HIGHLIGHT FOLLOWED TEAM
     <div>
@@ -394,7 +412,7 @@ function Home() {
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>
       <pre>
-        <h3>Division</h3>
+        <h3>{standings.length !== 0 && "Division"}</h3>
         {standings.map((team) => (
           <div key={team.name}>
             <div>{team.name}</div>
@@ -479,19 +497,21 @@ function Search() {
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>
       <pre>
-        {results.map((player) => (
-          <div key={player.playerId}>
-            <div>{player.name}</div>
-            <div>{player.teamAbbrev}</div>
-            <div>{player.positionCode}</div>
-            <div>{player.height}</div>
-            <div>{player.weightInPounds}</div>
-            <div>{player.birthCountry}</div>
-            <button onClick={() => (player.isFollowed ? handleUnfollowClick(player.playerId) : handleFollowClick(player.playerId))}>
-              {player.isFollowed ? "Unfollow" : "Follow"}
-            </button>
-          </div>
-        ))}
+        {results.length === 0
+          ? "No results found"
+          : results.map((player) => (
+              <div key={player.playerId}>
+                <div>{player.name}</div>
+                <div>{player.teamAbbrev}</div>
+                <div>{player.positionCode}</div>
+                <div>{player.height}</div>
+                <div>{player.weightInPounds}</div>
+                <div>{player.birthCountry}</div>
+                <button onClick={() => (player.isFollowed ? handleUnfollowClick(player.playerId) : handleFollowClick(player.playerId))}>
+                  {player.isFollowed ? "Unfollow" : "Follow"}
+                </button>
+              </div>
+            ))}
       </pre>
     </div>
   );
