@@ -368,8 +368,9 @@ async function fetchHelper(url: string, options?: string) {
 
 function Home() {
   const navigate = useNavigate();
-  const [homeData, setHomeData] = useState<playerStats[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [followedTeam, setFollowedTeam] = useState("");
+  const [homeData, setHomeData] = useState<playerStats[]>([]);
   const [standings, setStandings] = useState<teamStandings[]>([]);
 
   async function loadHome() {
@@ -379,9 +380,14 @@ function Home() {
     setStandings(data.standings);
   }
 
+  async function fetchTeam() {
+    const data = await fetchHelper("http://localhost:8080/api/following");
+    setFollowedTeam(data.team.TeamName);
+  }
+
   // Run effect
   useEffect(() => {
-    loadHome();
+    (loadHome(), fetchTeam());
   }, []);
 
   async function handleSearch() {
@@ -403,7 +409,6 @@ function Home() {
   }
 
   return (
-    // HIGHLIGHT FOLLOWED TEAM
     <div>
       <h1>Home</h1>
       <button onClick={() => navigate("/teams")}>Teams</button>
@@ -412,32 +417,52 @@ function Home() {
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>
       <pre>
-        <h3>{standings.length !== 0 && "Division"}</h3>
-        {standings.map((team) => (
-          <div key={team.name}>
-            <div>{team.name}</div>
-            <div>{team.games_played}</div>
-            <div>{team.wins}</div>
-            <div>{team.losses}</div>
-            <div>{team.otl}</div>
-            <div>{team.rw}</div>
-            <div>{team.row}</div>
-            <div>{team.goal_differential}</div>
-            <div>{team.last_10}</div>
-          </div>
-        ))}
-        {homeData.map((player) => (
-          <div key={player.name}>
-            <h3>{player.name}</h3>
-            <div>Games: {player.games_played}</div>
-            <div>Goals: {player.goals}</div>
-            <div>Assits: {player.assists}</div>
-            <div>Points: {player.points}</div>
-            <div>P/PG: {player["p/gp"]}</div>
-            <div>Last 5: {player.last_5_games_totals}</div>
-            <div>Playing today: {String(player.playing_today)}</div>
-          </div>
-        ))}
+        <div className="players">
+          {homeData.map((player) => (
+            <div key={player.name} className="player-card">
+              <h3>{player.name}</h3>
+              <div>Games: {player.games_played}</div>
+              <div>Goals: {player.goals}</div>
+              <div>Assits: {player.assists}</div>
+              <div>Points: {player.points}</div>
+              <div>P/PG: {player["p/gp"]}</div>
+              <div>Last 5: {player.last_5_games_totals}</div>
+              <div>Playing today: {String(player.playing_today)}</div>
+            </div>
+          ))}
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>GP</th>
+              <th>W</th>
+              <th>L</th>
+              <th>OTL</th>
+              <th>PTS</th>
+              <th>RW</th>
+              <th>ROW</th>
+              <th>GD</th>
+              <th>L10</th>
+            </tr>
+          </thead>
+          <tbody>
+            {standings.map((team) => (
+              <tr key={team.name} className={followedTeam === team.name ? "followed-team" : ""}>
+                <td>{team.name}</td>
+                <td>{team.games_played}</td>
+                <td>{team.wins}</td>
+                <td>{team.losses}</td>
+                <td>{team.otl}</td>
+                <td>{team.points}</td>
+                <td>{team.rw}</td>
+                <td>{team.row}</td>
+                <td>{team.goal_differential}</td>
+                <td>{team.last_10}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </pre>
     </div>
   );
