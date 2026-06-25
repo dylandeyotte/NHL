@@ -46,6 +46,9 @@ type playerStats = {
   "p/gp": string;
   last_5_games_totals: string;
   playing_today: boolean;
+  sweater_number: number;
+  position: string;
+  team_abbrev: string;
 };
 
 type teamStandings = {
@@ -409,7 +412,7 @@ function Home() {
   }
 
   return (
-    <div>
+    <div className="home-background">
       <h1>Home</h1>
       <button onClick={() => navigate("/teams")}>Teams</button>
       <button onClick={() => navigate("/following")}>Following</button>
@@ -420,14 +423,24 @@ function Home() {
         <div className="players">
           {homeData.map((player) => (
             <div key={player.name} className="player-card">
-              <h3>{player.name}</h3>
-              <div>Games: {player.games_played}</div>
-              <div>Goals: {player.goals}</div>
-              <div>Assits: {player.assists}</div>
-              <div>Points: {player.points}</div>
-              <div>P/PG: {player["p/gp"]}</div>
-              <div>Last 5: {player.last_5_games_totals}</div>
-              <div>Playing today: {String(player.playing_today)}</div>
+              <div className="bar"> </div>
+              <h3>
+                {player.name} | {player.team_abbrev}
+              </h3>
+              <h4>
+                {player.position} #{player.sweater_number}
+              </h4>
+              <div className="break">
+                <div>Games {player.games_played}</div>
+                <div>Goals {player.goals}</div>
+                <div>Assits {player.assists}</div>
+                <div>Points {player.points}</div>
+              </div>
+              <div>P/PG {player["p/gp"]}</div>
+              <div>Last 5 {player.last_5_games_totals}</div>
+              <div className="status">
+                <span className={`status-circle ${player.playing_today ? "playing" : "not-playing"}`} />
+              </div>
             </div>
           ))}
         </div>

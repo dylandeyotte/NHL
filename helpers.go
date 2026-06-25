@@ -165,14 +165,17 @@ func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (
 
 	// Make player struct with stats
 	player := Player{
-		Name:            stats.FirstName.Default + " " + stats.LastName.Default,
-		GamesPlayed:     stats.FeaturedStats.RegularSeason.SubSeason.GamesPlayed,
-		Goals:           stats.FeaturedStats.RegularSeason.SubSeason.Goals,
-		Assists:         stats.FeaturedStats.RegularSeason.SubSeason.Assists,
-		Points:          stats.FeaturedStats.RegularSeason.SubSeason.Points,
-		PointPercentage: ppg,
-		Last5Games:      last5StatLine,
-		PlayingToday:    pt,
+		Name:              stats.FirstName.Default + " " + stats.LastName.Default,
+		GamesPlayed:       stats.FeaturedStats.RegularSeason.SubSeason.GamesPlayed,
+		Goals:             stats.FeaturedStats.RegularSeason.SubSeason.Goals,
+		Assists:           stats.FeaturedStats.RegularSeason.SubSeason.Assists,
+		Points:            stats.FeaturedStats.RegularSeason.SubSeason.Points,
+		PointPercentage:   ppg,
+		Last5Games:        last5StatLine,
+		PlayingToday:      pt,
+		SweaterNumber:     stats.SweaterNumber,
+		Position:          stats.Position,
+		CurrentTeamAbbrev: stats.CurrentTeamAbbrev,
 	}
 	return player, nil
 }

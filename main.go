@@ -33,14 +33,17 @@ type User struct {
 }
 
 type Player struct {
-	Name            string `json:"name"`
-	GamesPlayed     int    `json:"games_played"`
-	Goals           int    `json:"goals"`
-	Assists         int    `json:"assists"`
-	Points          int    `json:"points"`
-	PointPercentage string `json:"p/gp"`
-	Last5Games      string `json:"last_5_games_totals"`
-	PlayingToday    bool   `json:"playing_today"`
+	Name              string `json:"name"`
+	GamesPlayed       int    `json:"games_played"`
+	Goals             int    `json:"goals"`
+	Assists           int    `json:"assists"`
+	Points            int    `json:"points"`
+	PointPercentage   string `json:"p/gp"`
+	Last5Games        string `json:"last_5_games_totals"`
+	PlayingToday      bool   `json:"playing_today"`
+	SweaterNumber     int    `json:"sweater_number"`
+	Position          string `json:"position"`
+	CurrentTeamAbbrev string `json:"team_abbrev"`
 }
 
 type Team struct {
