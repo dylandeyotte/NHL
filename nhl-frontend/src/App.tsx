@@ -1,4 +1,5 @@
 import "./App.css";
+import { teamColours } from "./data/team_colours";
 import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -126,14 +127,17 @@ function Teams() {
       <button onClick={() => navigate("/home")}>Home</button>
       {error && <p>{error}</p>}
       <pre>
-        {teamList.map((team) => (
-          <div key={team.name}>
-            <h3>{team.name}</h3>
-            <button onClick={() => (followedTeam === team.tricode ? handleUnfollowClick(team.tricode) : handleFollowClick(team.tricode))}>
-              {followedTeam === team.tricode ? "Unfollow" : "Follow"}
-            </button>
-          </div>
-        ))}
+        <div className="team-grid">
+          {teamList.map((team) => (
+            <div key={team.name} className="teams">
+              <h3>{team.name}</h3>
+              <img src={`https://assets.nhle.com/logos/nhl/svg/${team.tricode}_light.svg`} alt={team.name} className="team-logo" />
+              <button onClick={() => (followedTeam === team.tricode ? handleUnfollowClick(team.tricode) : handleFollowClick(team.tricode))}>
+                {followedTeam === team.tricode ? "Unfollow" : "Follow"}
+              </button>
+            </div>
+          ))}
+        </div>
       </pre>
     </div>
   );
@@ -423,23 +427,35 @@ function Home() {
         <div className="players">
           {homeData.map((player) => (
             <div key={player.name} className="player-card">
-              <div className="bar"> </div>
-              <h3>
-                {player.name} | {player.team_abbrev}
+              <div className="accent-bar" style={{ "--team-colour": teamColours[player.team_abbrev] } as React.CSSProperties}>
+                {" "}
+              </div>
+              <h3 className="card-header">
+                <span>{player.name}</span>
+                <span>{player.team_abbrev}</span>
               </h3>
               <h4>
-                {player.position} #{player.sweater_number}
+                <div className="status">
+                  <span>{player.position}</span>
+                  <span>#{player.sweater_number}</span>
+                  <span className={`status-circle ${player.playing_today ? "playing" : "not-playing"}`} />
+                </div>
               </h4>
-              <div className="break">
-                <div>Games {player.games_played}</div>
-                <div>Goals {player.goals}</div>
-                <div>Assits {player.assists}</div>
-                <div>Points {player.points}</div>
+              <div className="stats">
+                <span>Games</span>
+                <span>{player.games_played}</span>
+                <span>Goals</span>
+                <span>{player.goals}</span>
+                <span>Assists</span>
+                <span>{player.assists}</span>
+                <span>Points</span>
+                <span>{player.points}</span>
               </div>
-              <div>P/PG {player["p/gp"]}</div>
-              <div>Last 5 {player.last_5_games_totals}</div>
-              <div className="status">
-                <span className={`status-circle ${player.playing_today ? "playing" : "not-playing"}`} />
+              <div className="extra-stats">
+                <span>P/PG</span>
+                <span>{player["p/gp"]}</span>
+                <span>Last 5</span>
+                <span>{player.last_5_games_totals}</span>
               </div>
             </div>
           ))}

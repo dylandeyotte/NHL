@@ -103,6 +103,7 @@ func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPla
 
 		// Concurrently build list of player stats
 		go cfg.buildPlayerHelper(i, followedPlayer, output, &wait, errCh)
+		fmt.Println(followedPlayer.PlayerName)
 	}
 	// Wait for counter to zero and close channel
 	wait.Wait()
@@ -114,7 +115,6 @@ func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPla
 			return nil, err
 		}
 	}
-
 	return output, nil
 }
 
@@ -158,8 +158,9 @@ func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (
 	ppg := fmt.Sprintf("%.2f", ppgFloat)
 
 	// Get playing today status
-	pt, err := playingToday(stats.CurrentTeamAbbrev, "", nil)
+	pt, err := cfg.playingToday(stats.CurrentTeamAbbrev, "", nil)
 	if err != nil {
+		fmt.Println("playing today error")
 		return Player{}, err
 	}
 
@@ -196,7 +197,8 @@ func buildLast5StatLine(stats PlayerStats) string {
 	return last5StatLine
 }
 
-func playingToday(teamAbbrev, baseURL string, client *http.Client) (bool, error) {
+func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Client) (bool, error) {
+	schedule := Schedule{}
 	// Check URL and client for testing
 	if baseURL == "" {
 		baseURL = "https://api-web.nhle.com"
@@ -207,19 +209,39 @@ func playingToday(teamAbbrev, baseURL string, client *http.Client) (bool, error)
 	// Assemble URL
 	url := fmt.Sprintf("%v/v1/club-schedule/%v/week/now", baseURL, teamAbbrev)
 
-	// Make HTTP request
-	resp, err := client.Get(url)
-	if err != nil {
-		return false, err
-	}
-	defer resp.Body.Close()
+	// Check cache for data
+	entry, ok := cfg.cache.Get(url)
+	if ok {
+		fmt.Println("entry in cache")
+		if err := json.Unmarshal(entry, &schedule); err != nil {
+			return false, err
+		}
+	} else {
+		// Make HTTP request
+		resp, err := client.Get(url)
+		if err != nil {
+			return false, err
+		}
+		defer resp.Body.Close()
 
-	// Decode JSON
-	schedule := Schedule{}
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&schedule); err != nil {
-		return false, err
+		fmt.Println("Status:", resp.StatusCode)
+
+		// Get byte data
+		data, err := io.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Printf("byte data error for %v: %v\n", teamAbbrev, err)
+			return false, err
+		}
+		// Cache data
+		cfg.cache.Add(url, data)
+
+		// Unmarshal data
+		if err := json.Unmarshal(data, &schedule); err != nil {
+			fmt.Printf("Unmarshalling error for %v\n", teamAbbrev)
+			return false, err
+		}
 	}
+
 	// Loop through schedule
 	gameCheck := false
 	for _, game := range schedule.Games {
@@ -236,6 +258,7 @@ func playingToday(teamAbbrev, baseURL string, client *http.Client) (bool, error)
 		}
 
 	}
+	fmt.Printf("schedule for %v OK\n", teamAbbrev)
 	return gameCheck, nil
 }
 

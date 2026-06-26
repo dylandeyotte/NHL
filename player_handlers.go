@@ -40,7 +40,6 @@ func (cfg *apiConfig) handlerHome(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, "Error creating player stats", err)
 		return
 	}
-
 	// Get followed team
 	returnTeamList := []Team{}
 	team, err := cfg.database.GetFollowedTeam(r.Context(), userID)

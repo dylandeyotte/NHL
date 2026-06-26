@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestPlayingToday(t *testing.T) {
+func (cfg *apiConfig) TestPlayingToday(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -17,7 +17,7 @@ func TestPlayingToday(t *testing.T) {
 
 	client := server.Client()
 
-	test, err := playingToday("VGK", server.URL, client)
+	test, err := cfg.playingToday("VGK", server.URL, client)
 	if err != nil {
 		t.Fatalf("error: %v", err)
 	}
