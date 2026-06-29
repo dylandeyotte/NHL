@@ -174,6 +174,7 @@ type PlayerSearchResults []struct {
 	TeamAbbrev     string `json:"teamAbbrev"`
 	Height         string `json:"height"`
 	WeightInPounds int    `json:"weightInPounds"`
+	BirthCity      string `json:"birthCity"`
 	BirthCountry   string `json:"birthCountry"`
 	IsFollowed     bool   `json:"isFollowed"`
 }

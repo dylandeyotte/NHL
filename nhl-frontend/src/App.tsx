@@ -130,8 +130,8 @@ function Teams() {
         <div className="team-grid">
           {teamList.map((team) => (
             <div key={team.name} className="teams">
-              <h3>{team.name}</h3>
               <img src={`https://assets.nhle.com/logos/nhl/svg/${team.tricode}_light.svg`} alt={team.name} className="team-logo" />
+              <p>{team.name}</p>
               <button onClick={() => (followedTeam === team.tricode ? handleUnfollowClick(team.tricode) : handleFollowClick(team.tricode))}>
                 {followedTeam === team.tricode ? "Unfollow" : "Follow"}
               </button>
@@ -209,14 +209,17 @@ function Following() {
         {team?.TeamName && <button onClick={() => handleUnfollowTeamClick(team?.TriCode)}>Unfollow</button>}
       </pre>
       <pre>
-        {following &&
-          following.map((player) => (
-            <div key={player.PlayerID}>
-              <h3>{player.PlayerName}</h3>
-              <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
-            </div>
-          ))}
+        <div className="followed-page">
+          {following &&
+            following.map((player) => (
+              <div key={player.PlayerID} className="followed-player">
+                <h3>{player.PlayerName}</h3>
+                <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
+              </div>
+            ))}
+        </div>
       </pre>
+      <p>{following.length} players followed</p>
     </div>
   );
 }
@@ -460,38 +463,40 @@ function Home() {
             </div>
           ))}
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Team</th>
-              <th>GP</th>
-              <th>W</th>
-              <th>L</th>
-              <th>OTL</th>
-              <th>PTS</th>
-              <th>RW</th>
-              <th>ROW</th>
-              <th>GD</th>
-              <th>L10</th>
-            </tr>
-          </thead>
-          <tbody>
-            {standings.map((team) => (
-              <tr key={team.name} className={followedTeam === team.name ? "followed-team" : ""}>
-                <td>{team.name}</td>
-                <td>{team.games_played}</td>
-                <td>{team.wins}</td>
-                <td>{team.losses}</td>
-                <td>{team.otl}</td>
-                <td>{team.points}</td>
-                <td>{team.rw}</td>
-                <td>{team.row}</td>
-                <td>{team.goal_differential}</td>
-                <td>{team.last_10}</td>
+        {followedTeam != "" && (
+          <table>
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>GP</th>
+                <th>W</th>
+                <th>L</th>
+                <th>OTL</th>
+                <th>PTS</th>
+                <th>RW</th>
+                <th>ROW</th>
+                <th>GD</th>
+                <th>L10</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {standings.map((team) => (
+                <tr key={team.name} className={followedTeam === team.name ? "followed-team" : ""}>
+                  <td>{team.name}</td>
+                  <td>{team.games_played}</td>
+                  <td>{team.wins}</td>
+                  <td>{team.losses}</td>
+                  <td>{team.otl}</td>
+                  <td>{team.points}</td>
+                  <td>{team.rw}</td>
+                  <td>{team.row}</td>
+                  <td>{team.goal_differential}</td>
+                  <td>{team.last_10}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </pre>
     </div>
   );
@@ -510,6 +515,7 @@ function Search() {
     teamAbbrev: string;
     height: string;
     weightInPounds: number;
+    birthCity: string;
     birthCountry: string;
     isFollowed: boolean;
   };
@@ -551,21 +557,34 @@ function Search() {
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>
       <pre>
-        {results.length === 0
-          ? "No results found"
-          : results.map((player) => (
-              <div key={player.playerId}>
-                <div>{player.name}</div>
-                <div>{player.teamAbbrev}</div>
-                <div>{player.positionCode}</div>
-                <div>{player.height}</div>
-                <div>{player.weightInPounds}</div>
-                <div>{player.birthCountry}</div>
-                <button onClick={() => (player.isFollowed ? handleUnfollowClick(player.playerId) : handleFollowClick(player.playerId))}>
-                  {player.isFollowed ? "Unfollow" : "Follow"}
-                </button>
-              </div>
-            ))}
+        <div className="search-page">
+          {results.length === 0
+            ? "No results found"
+            : results.map((player) => (
+                <div key={player.playerId} className="search-cards">
+                  <div className="accent-bar" style={{ "--team-colour": teamColours[player.teamAbbrev] } as React.CSSProperties}>
+                    {" "}
+                  </div>
+                  <div className="follow-card-header">
+                    <span>{player.name}</span>
+                    <span>{player.teamAbbrev}</span>
+                  </div>
+                  <div className="follow-card-pob">
+                    {player.birthCity}, {player.birthCountry}
+                  </div>
+                  <div className="follow-card-bio">
+                    {player.positionCode} | {player.height} | {player.weightInPounds} lbs
+                    <div className="search-follow-button">
+                      <button
+                        onClick={() => (player.isFollowed ? handleUnfollowClick(player.playerId) : handleFollowClick(player.playerId))}
+                      >
+                        {player.isFollowed ? "Unfollow" : "Follow"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+        </div>
       </pre>
     </div>
   );

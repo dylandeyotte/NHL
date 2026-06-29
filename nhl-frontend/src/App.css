@@ -2,10 +2,10 @@
   width: 350px;
   padding: auto;
   border-radius: 8px;
-  color: black;
-  font-size: large;
   border-style: solid;
   border-color: black;
+  font-size: large;
+  color: black;
 }
 
 .players {
@@ -73,7 +73,6 @@ table {
   width: 100%;
   border-collapse: collapse;
   gap: 20px;
-  background: linear-gradient(to bottom, rgb(97, 139, 97), rgb(217, 217, 94), rgb(212, 85, 85));
 }
 
 th,
@@ -88,13 +87,15 @@ th {
 
 .followed-team {
   font-weight: bold;
+  background-color: rgb(215, 215, 215);
 }
 
 .teams {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
   align-items: center;
+  justify-content: center;
 }
 
 .team-grid {
@@ -105,4 +106,70 @@ th {
 
 .team-logo {
   width: 75px;
+  height: 75px;
+}
+
+.followed-player {
+  padding: auto;
+  width: 350px;
+  border-radius: 8px;
+  border-style: solid;
+  border-color: black;
+  font-size: large;
+  color: black;
+}
+
+.followed-page {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  justify-items: center;
+}
+
+.search-page {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  align-items: center;
+  text-align: left;
+  padding-bottom: 20px;
+}
+
+.search-cards {
+  width: 450px;
+  border-radius: 8px;
+  border-style: solid;
+  border-color: black;
+  font-size: large;
+  color: black;
+}
+
+.follow-card-header {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 3px;
+  padding-right: 3px;
+  font-size: larger;
+}
+
+.follow-card-pob {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding-left: 3px;
+  font-size: large;
+}
+
+.follow-card-bio {
+  display: flex;
+  font-size: large;
+  padding-left: 3px;
+  justify-content: space-between;
+}
+
+.search-follow-button {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-right: 5x;
 }

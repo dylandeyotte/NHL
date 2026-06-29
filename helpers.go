@@ -156,6 +156,9 @@ func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (
 	// Calculate points per game
 	ppgFloat := float64(stats.FeaturedStats.RegularSeason.SubSeason.Points) / float64(stats.FeaturedStats.RegularSeason.SubSeason.GamesPlayed)
 	ppg := fmt.Sprintf("%.2f", ppgFloat)
+	if stats.FeaturedStats.RegularSeason.SubSeason.GamesPlayed == 0 {
+		ppg = "-"
+	}
 
 	// Get playing today status
 	pt, err := cfg.playingToday(stats.CurrentTeamAbbrev, "", nil)
