@@ -12,6 +12,13 @@ import (
 	"github.com/dylandeyotte/nhl/internal/database"
 )
 
+type PlayerCard int
+
+const (
+	Stats PlayerCard = iota
+	Bio
+)
+
 func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 	standings := Standings{}
 	URL := "https://api-web.nhle.com/v1/standings/now"
@@ -75,20 +82,21 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 	return returnList, nil
 }
 
-func (cfg *apiConfig) buildPlayerHelper(i int, followedPlayer database.FollowedPlayer, output []Player, wait *sync.WaitGroup, errCh chan error) {
+func (cfg *apiConfig) buildPlayerHelper(i int, followedPlayer database.FollowedPlayer, output []Player, wait *sync.WaitGroup, errCh chan error, pc PlayerCard) {
 	// Defer counter decrease
 	defer wait.Done()
 
 	// Build stats for player
-	player, err := cfg.buildPlayerStats(followedPlayer)
+	player, err := cfg.buildPlayerInfo(followedPlayer, pc)
 	if err != nil {
+		fmt.Println("error line 92")
 		errCh <- err
 		return
 	}
 	// Add player to output list at index
 	output[i] = player
 }
-func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPlayer) ([]Player, error) {
+func (cfg *apiConfig) buildPlayerlist(playerList []database.FollowedPlayer, pc PlayerCard) ([]Player, error) {
 	// Create output list
 	output := make([]Player, len(playerList))
 
@@ -102,7 +110,7 @@ func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPla
 		wait.Add(1)
 
 		// Concurrently build list of player stats
-		go cfg.buildPlayerHelper(i, followedPlayer, output, &wait, errCh)
+		go cfg.buildPlayerHelper(i, followedPlayer, output, &wait, errCh, pc)
 		fmt.Println(followedPlayer.PlayerName)
 	}
 	// Wait for counter to zero and close channel
@@ -112,13 +120,14 @@ func (cfg *apiConfig) buildPlayerlistWithStats(playerList []database.FollowedPla
 	// Loop through channel, checking for err
 	for err := range errCh {
 		if err != nil {
+			fmt.Println("error line 123")
 			return nil, err
 		}
 	}
 	return output, nil
 }
 
-func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (Player, error) {
+func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc PlayerCard) (Player, error) {
 	stats := PlayerStats{}
 	// Assemble URL
 	URL := fmt.Sprintf("https://api-web.nhle.com/v1/player/%v/landing", followedPlayer.PlayerID)
@@ -133,13 +142,17 @@ func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (
 		// Make HTTP request
 		resp, err := http.Get(URL)
 		if err != nil {
+			fmt.Println("error line 145")
 			return Player{}, err
 		}
 		defer resp.Body.Close()
 
+		fmt.Println(resp.StatusCode)
+
 		// Get byte data
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
+			fmt.Println("error line 155")
 			return Player{}, err
 		}
 		// Cache data
@@ -147,9 +160,28 @@ func (cfg *apiConfig) buildPlayerStats(followedPlayer database.FollowedPlayer) (
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &stats); err != nil {
+			fmt.Println("error line 163")
 			return Player{}, err
 		}
 	}
+
+	// Return player struct for bio
+	if pc == Bio {
+		return Player{
+			PlayerID:          stats.PlayerID,
+			Name:              stats.FirstName.Default + " " + stats.LastName.Default,
+			CurrentTeamAbbrev: stats.CurrentTeamAbbrev,
+			Position:          stats.Position,
+			BirthDate:         stats.BirthDate,
+			BirthCity:         stats.BirthCity.Default,
+			BirthCountry:      stats.BirthCountry,
+			DraftYear:         stats.DraftDetails.Year,
+			DraftPosition:     stats.DraftDetails.OverallPick,
+			Height:            stats.HeightInInches,
+			Weight:            stats.WeightInPounds,
+		}, nil
+	}
+
 	// Get stat line for last 5 games
 	last5StatLine := buildLast5StatLine(stats)
 

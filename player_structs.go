@@ -1,7 +1,7 @@
 package main
 
 type PlayerStats struct {
-	PlayerID          int    `json:"playerId"`
+	PlayerID          int    `json:"playerID"`
 	IsActive          bool   `json:"isActive"`
 	CurrentTeamID     int    `json:"currentTeamId"`
 	CurrentTeamAbbrev string `json:"currentTeamAbbrev"`

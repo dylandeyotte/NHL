@@ -152,7 +152,7 @@ th {
   font-size: larger;
 }
 
-.follow-card-pob {
+.search-card-pob {
   display: flex;
   align-items: center;
   gap: 40px;
@@ -160,7 +160,7 @@ th {
   font-size: large;
 }
 
-.follow-card-bio {
+.search-card-bio {
   display: flex;
   font-size: large;
   padding-left: 3px;
@@ -172,4 +172,9 @@ th {
   flex-wrap: wrap;
   justify-content: center;
   padding-right: 5x;
+}
+
+.draft-details {
+  display: flex;
+  padding-left: 5px;
 }

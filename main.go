@@ -33,6 +33,7 @@ type User struct {
 }
 
 type Player struct {
+	PlayerID          int    `json:"player_id"`
 	Name              string `json:"name"`
 	GamesPlayed       int    `json:"games_played"`
 	Goals             int    `json:"goals"`
@@ -44,6 +45,13 @@ type Player struct {
 	SweaterNumber     int    `json:"sweater_number"`
 	Position          string `json:"position"`
 	CurrentTeamAbbrev string `json:"team_abbrev"`
+	BirthDate         string `json:"birth_date"`
+	BirthCity         string `json:"birth_city"`
+	BirthCountry      string `json:"birth_country"`
+	DraftYear         int    `json:"draft_year"`
+	DraftPosition     int    `json:"draft_pos"`
+	Height            int    `json:"height"`
+	Weight            int    `json:"weight"`
 }
 
 type Team struct {

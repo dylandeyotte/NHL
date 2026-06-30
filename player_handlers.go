@@ -34,9 +34,12 @@ func (cfg *apiConfig) handlerHome(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	fmt.Println("past followed players")
 	// Build list of players with stats
-	returnPlayerList, err := cfg.buildPlayerlistWithStats(playerList)
+	var pc PlayerCard = Stats
+	returnPlayerList, err := cfg.buildPlayerlist(playerList, pc)
 	if err != nil {
+		fmt.Println("error building list line 42")
 		respondWithError(w, http.StatusInternalServerError, "Error creating player stats", err)
 		return
 	}
@@ -56,6 +59,7 @@ func (cfg *apiConfig) handlerHome(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	fmt.Println("built team")
 	// Build JSON payload for return
 	type JSONData struct {
 		Standings []Team   `json:"standings"`
@@ -99,14 +103,21 @@ func (cfg *apiConfig) handlerGetFollows(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
+
+	var pc PlayerCard = Bio
+	returnPlayerList, err := cfg.buildPlayerlist(playerList, pc)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Error creating player stats", err)
+		return
+	}
 	// Build JSON payload for return
 	type JSONData struct {
-		Team    database.FollowedTeam     `json:"team"`
-		Players []database.FollowedPlayer `json:"players"`
+		Team    database.FollowedTeam `json:"team"`
+		Players []Player              `json:"players"`
 	}
 	payload := JSONData{
 		Team:    followedTeam,
-		Players: playerList,
+		Players: returnPlayerList,
 	}
 	// Respond with JSON
 	respondWithJSON(w, http.StatusOK, payload)

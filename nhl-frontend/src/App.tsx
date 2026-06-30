@@ -4,38 +4,38 @@ import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 
 const teamList = [
-  { name: "Anaheim Ducks", tricode: "ANA" },
-  { name: "Boston Bruins", tricode: "BOS" },
-  { name: "Buffalo Sabres", tricode: "BUF" },
-  { name: "Calgary Flames", tricode: "CGY" },
-  { name: "Carolina Hurricanes", tricode: "CAR" },
-  { name: "Chicago Blackhawks", tricode: "CHI" },
-  { name: "Colorado Avalanche", tricode: "COL" },
-  { name: "Columbus Blue Jackets", tricode: "CBJ" },
-  { name: "Dallas Stars", tricode: "DAL" },
-  { name: "Detroit Red Wings", tricode: "DET" },
-  { name: "Edmonton Oilers", tricode: "EDM" },
-  { name: "Florida Panthers", tricode: "FLA" },
-  { name: "Los Angeles Kings", tricode: "LAK" },
-  { name: "Minnesota Wild", tricode: "MIN" },
-  { name: "Montréal Canadiens", tricode: "MTL" },
-  { name: "Nashville Predators", tricode: "NSH" },
-  { name: "New Jersey Devils", tricode: "NJD" },
-  { name: "New York Islanders", tricode: "NYI" },
-  { name: "New York Rangers", tricode: "NYR" },
-  { name: "Ottawa Senators", tricode: "OTT" },
-  { name: "Philadelphia Flyers", tricode: "PHI" },
-  { name: "Pittsburgh Penguins", tricode: "PIT" },
-  { name: "San Jose Sharks", tricode: "SJS" },
-  { name: "Seattle Kraken", tricode: "SEA" },
-  { name: "St. Louis Blues", tricode: "STL" },
-  { name: "Tampa Bay Lightning", tricode: "TBL" },
-  { name: "Toronto Maple Leafs", tricode: "TOR" },
-  { name: "Utah Mammoth", tricode: "UTA" },
-  { name: "Vancouver Canucks", tricode: "VAN" },
-  { name: "Vegas Golden Knights", tricode: "VGK" },
-  { name: "Washington Capitals", tricode: "WSH" },
-  { name: "Winnipeg Jets", tricode: "WPG" },
+  { name: "Anaheim Ducks", tricode: "ANA", division: "Pacific" },
+  { name: "Boston Bruins", tricode: "BOS", division: "Atlantic" },
+  { name: "Buffalo Sabres", tricode: "BUF", division: "Atlantic" },
+  { name: "Calgary Flames", tricode: "CGY", division: "Pacific" },
+  { name: "Carolina Hurricanes", tricode: "CAR", division: "Metropiltan" },
+  { name: "Chicago Blackhawks", tricode: "CHI", division: "Central" },
+  { name: "Colorado Avalanche", tricode: "COL", division: "Central" },
+  { name: "Columbus Blue Jackets", tricode: "CBJ", division: "Metropiltan" },
+  { name: "Dallas Stars", tricode: "DAL", division: "Central" },
+  { name: "Detroit Red Wings", tricode: "DET", division: "Atlantic" },
+  { name: "Edmonton Oilers", tricode: "EDM", division: "Pacific" },
+  { name: "Florida Panthers", tricode: "FLA", division: "Atlantic" },
+  { name: "Los Angeles Kings", tricode: "LAK", division: "Pacific" },
+  { name: "Minnesota Wild", tricode: "MIN", division: "Central" },
+  { name: "Montréal Canadiens", tricode: "MTL", division: "Atlantic" },
+  { name: "Nashville Predators", tricode: "NSH", division: "Central" },
+  { name: "New Jersey Devils", tricode: "NJD", division: "Metropiltan" },
+  { name: "New York Islanders", tricode: "NYI", division: "Metropiltan" },
+  { name: "New York Rangers", tricode: "NYR", division: "Metropiltan" },
+  { name: "Ottawa Senators", tricode: "OTT", division: "Atlantic" },
+  { name: "Philadelphia Flyers", tricode: "PHI", division: "Metropiltan" },
+  { name: "Pittsburgh Penguins", tricode: "PIT", division: "Metropiltan" },
+  { name: "San Jose Sharks", tricode: "SJS", division: "Pacific" },
+  { name: "Seattle Kraken", tricode: "SEA", division: "Pacific" },
+  { name: "St. Louis Blues", tricode: "STL", division: "Central" },
+  { name: "Tampa Bay Lightning", tricode: "TBL", division: "Atlantic" },
+  { name: "Toronto Maple Leafs", tricode: "TOR", division: "Atlantic" },
+  { name: "Utah Mammoth", tricode: "UTA", division: "Central" },
+  { name: "Vancouver Canucks", tricode: "VAN", division: "Pacific" },
+  { name: "Vegas Golden Knights", tricode: "VGK", division: "Pacific" },
+  { name: "Washington Capitals", tricode: "WSH", division: "Metropiltan" },
+  { name: "Winnipeg Jets", tricode: "WPG", division: "Central" },
 ];
 
 type playerStats = {
@@ -149,8 +149,17 @@ function Following() {
   const navigate = useNavigate();
 
   type followee = {
-    PlayerName: string;
-    PlayerID: number;
+    player_id: number;
+    name: string;
+    position: string;
+    team_abbrev: string;
+    birth_date: string;
+    birth_city: string;
+    birth_country: string;
+    draft_year: number;
+    draft_pos: number;
+    weight: number;
+    height: number;
   };
 
   type followedTeam = {
@@ -199,7 +208,7 @@ function Following() {
       </div>
     );
   }
-
+  console.log(following[0]);
   return (
     <div>
       <h1>Following</h1>
@@ -212,9 +221,25 @@ function Following() {
         <div className="followed-page">
           {following &&
             following.map((player) => (
-              <div key={player.PlayerID} className="followed-player">
-                <h3>{player.PlayerName}</h3>
-                <button onClick={() => handleUnfollowPlayerClick(player.PlayerID)}>Unfollow</button>
+              <div key={player.player_id} className="player-card">
+                <div className="accent-bar" style={{ "--team-colour": teamColours[player.team_abbrev] } as React.CSSProperties}>
+                  {" "}
+                </div>
+                <h3 className="card-header">
+                  <span>{player.name}</span>
+                  <span>{player.team_abbrev}</span>
+                </h3>
+                <div className="search-card-bio">
+                  {player.position} | {player.height} | {player.weight} lbs
+                </div>
+                <div className="search-card-pob">
+                  <span>{player.birth_date}</span>
+                  <span>
+                    {player.birth_city}, {player.birth_country === "CHE" ? "SUI" : player.birth_country}
+                  </span>
+                </div>
+                <div className="draft-details">{player.draft_year === 0 ? "Undrafted" : `${player.draft_year} (#${player.draft_pos})`}</div>
+                <button onClick={() => handleUnfollowPlayerClick(player.player_id)}>Unfollow</button>
               </div>
             ))}
         </div>
@@ -467,7 +492,7 @@ function Home() {
           <table>
             <thead>
               <tr>
-                <th>Team</th>
+                <th>{teamList.map((team) => team.name === followedTeam && `${team.division} Division`)}</th>
                 <th>GP</th>
                 <th>W</th>
                 <th>L</th>
@@ -569,10 +594,10 @@ function Search() {
                     <span>{player.name}</span>
                     <span>{player.teamAbbrev}</span>
                   </div>
-                  <div className="follow-card-pob">
+                  <div className="search-card-pob">
                     {player.birthCity}, {player.birthCountry}
                   </div>
-                  <div className="follow-card-bio">
+                  <div className="search-card-bio">
                     {player.positionCode} | {player.height} | {player.weightInPounds} lbs
                     <div className="search-follow-button">
                       <button
