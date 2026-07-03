@@ -55,11 +55,11 @@
 }
 
 .stats {
-  background-color: rgb(236, 236, 236);
   display: grid;
   grid-template-columns: 90px auto;
   row-gap: 6px;
   padding-left: 1px;
+  background-color: rgb(236, 236, 236);
 }
 
 .extra-stats {
@@ -109,6 +109,27 @@ th {
   height: 75px;
 }
 
+.following-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.followed-team-box {
+  border-style: solid;
+  border-radius: 8px;
+  width: 350px;
+  color: black;
+  background-color: var(--team-colour);
+}
+
+.followed-page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
 .followed-player {
   padding: auto;
   width: 350px;
@@ -119,11 +140,29 @@ th {
   color: black;
 }
 
-.followed-page {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  justify-items: center;
+.card-pob {
+  display: flex;
+  justify-content: space-between;
+  gap: auto;
+  padding-left: 3px;
+  padding-right: 3px;
+  font-size: large;
+}
+
+.pob-long {
+  font-size: medium;
+}
+
+.card-bio {
+  display: flex;
+  font-size: large;
+  padding-left: 3px;
+  justify-content: space-between;
+}
+
+.draft-details {
+  display: flex;
+  padding-left: 5px;
 }
 
 .search-page {
@@ -144,7 +183,7 @@ th {
   color: black;
 }
 
-.follow-card-header {
+.search-card-header {
   display: flex;
   justify-content: space-between;
   padding-left: 3px;
@@ -152,35 +191,9 @@ th {
   font-size: larger;
 }
 
-.search-card-pob {
-  display: flex;
-  justify-content: space-between;
-  overflow-wrap: break-word;
-  gap: auto;
-  padding-left: 3px;
-  padding-right: 3px;
-  font-size: large;
-}
-
-.pob-long {
-  font-size: medium;
-}
-
-.search-card-bio {
-  display: flex;
-  font-size: large;
-  padding-left: 3px;
-  justify-content: space-between;
-}
-
 .search-follow-button {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   padding-right: 5x;
-}
-
-.draft-details {
-  display: flex;
-  padding-left: 5px;
 }

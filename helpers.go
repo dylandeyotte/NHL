@@ -136,6 +136,7 @@ func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc
 	entry, ok := cfg.cache.Get(URL)
 	if ok {
 		if err := json.Unmarshal(entry, &stats); err != nil {
+			fmt.Println("error line 139")
 			return Player{}, err
 		}
 	} else {

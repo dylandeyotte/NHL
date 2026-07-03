@@ -34,12 +34,10 @@ func (cfg *apiConfig) handlerHome(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println("past followed players")
 	// Build list of players with stats
 	var pc PlayerCard = Stats
 	returnPlayerList, err := cfg.buildPlayerlist(playerList, pc)
 	if err != nil {
-		fmt.Println("error building list line 42")
 		respondWithError(w, http.StatusInternalServerError, "Error creating player stats", err)
 		return
 	}
@@ -59,7 +57,6 @@ func (cfg *apiConfig) handlerHome(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println("built team")
 	// Build JSON payload for return
 	type JSONData struct {
 		Standings []Team   `json:"standings"`
