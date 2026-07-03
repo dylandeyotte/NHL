@@ -154,10 +154,16 @@ th {
 
 .search-card-pob {
   display: flex;
-  align-items: center;
-  gap: 40px;
+  justify-content: space-between;
+  overflow-wrap: break-word;
+  gap: auto;
   padding-left: 3px;
+  padding-right: 3px;
   font-size: large;
+}
+
+.pob-long {
+  font-size: medium;
 }
 
 .search-card-bio {

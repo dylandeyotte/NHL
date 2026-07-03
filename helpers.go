@@ -255,6 +255,7 @@ func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Clie
 		// Make HTTP request
 		resp, err := client.Get(url)
 		if err != nil {
+			fmt.Println("http error playing today")
 			return false, err
 		}
 		defer resp.Body.Close()
@@ -300,6 +301,7 @@ func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Clie
 func respondWithError(w http.ResponseWriter, code int, msg string, err error) {
 	if err != nil {
 		log.Println(err)
+		fmt.Println(msg)
 	}
 	w.WriteHeader(code)
 	w.Write([]byte(msg))

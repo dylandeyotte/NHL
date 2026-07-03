@@ -143,6 +143,23 @@ function Teams() {
   );
 }
 
+function formatDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+
+  return new Date(year, month - 1, day).toLocaleDateString("en-CA", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+}
+
+function formatHeight(height: number) {
+  const ft = Math.floor(height / 12);
+  const inch = height % 12;
+
+  return `${ft}'${inch}"`;
+}
+
 function Following() {
   const [following, setFollowing] = useState<followee[]>([]);
   const [team, setTeam] = useState<followedTeam>();
@@ -208,7 +225,7 @@ function Following() {
       </div>
     );
   }
-  console.log(following[0]);
+
   return (
     <div>
       <h1>Following</h1>
@@ -230,11 +247,11 @@ function Following() {
                   <span>{player.team_abbrev}</span>
                 </h3>
                 <div className="search-card-bio">
-                  {player.position} | {player.height} | {player.weight} lbs
+                  {player.position} | {formatHeight(player.height)} | {player.weight} lbs
                 </div>
                 <div className="search-card-pob">
-                  <span>{player.birth_date}</span>
-                  <span>
+                  <span>{formatDate(player.birth_date)}</span>
+                  <span className={player.birth_city.length > 17 ? "pob-long" : "pob"}>
                     {player.birth_city}, {player.birth_country === "CHE" ? "SUI" : player.birth_country}
                   </span>
                 </div>
