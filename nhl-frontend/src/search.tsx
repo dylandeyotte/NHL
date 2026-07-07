@@ -76,7 +76,7 @@ export function Search() {
                   </div>
                   <div className="card-bio">
                     {player.positionCode} | {player.height} | {player.weightInPounds} lbs
-                    <div className="search-follow-button">
+                    <div className={player.isFollowed ? "unfollow-button" : "follow-button"}>
                       <button
                         onClick={() => (player.isFollowed ? handleUnfollowClick(player.playerId) : handleFollowClick(player.playerId))}
                       >

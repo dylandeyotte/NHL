@@ -64,8 +64,14 @@ export function Home() {
     return (
       <div>
         <h1>Home</h1>
-        <button onClick={() => navigate("/teams")}>Teams</button>
-        <button onClick={() => navigate("/following")}>Following</button>
+        <div className="button-row">
+          <button onClick={() => navigate("/teams")} className="home-team-button">
+            Teams
+          </button>
+          <button onClick={() => navigate("/following")} className="home-following-button">
+            Following
+          </button>
+        </div>
         <form onSubmit={handleSearch}>
           <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </form>
@@ -77,8 +83,14 @@ export function Home() {
   return (
     <div className="home-background">
       <h1>Home</h1>
-      <button onClick={() => navigate("/teams")}>Teams</button>
-      <button onClick={() => navigate("/following")}>Following</button>
+      <div className="button-row">
+        <button onClick={() => navigate("/teams")} className="home-team-button">
+          Teams
+        </button>
+        <button onClick={() => navigate("/following")} className="home-following-button">
+          Following
+        </button>
+      </div>
       <form onSubmit={handleSearch}>
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </form>

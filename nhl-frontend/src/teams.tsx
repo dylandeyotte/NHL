@@ -42,7 +42,7 @@ export function Teams() {
           {teamList.map((team) => (
             <div key={team.name} className="teams">
               <img src={`https://assets.nhle.com/logos/nhl/svg/${team.tricode}_light.svg`} alt={team.name} className="team-logo" />
-              <p>{team.name}</p>
+              <div className="team-name">{team.name}</div>
               <div className={followedTeam === team.tricode ? "unfollow-button" : "follow-button"}>
                 <button
                   onClick={() => (followedTeam === team.tricode ? handleUnfollowClick(team.tricode) : handleFollowClick(team.tricode))}

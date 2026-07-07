@@ -27,14 +27,14 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 	entry, ok := cfg.cache.Get(URL)
 	if ok {
 		if err := json.Unmarshal(entry, &standings); err != nil {
-			fmt.Printf("unmarshalling error from cache: %v", err)
+			fmt.Printf("unmarshalling error from cache: %v\n", err)
 			return nil, err
 		}
 	} else {
 		// Make HTTP request
 		resp, err := http.Get(URL)
 		if err != nil {
-			fmt.Printf("hhtp request error: %v", err)
+			fmt.Printf("hhtp request error: %v\n", err)
 			return nil, err
 		}
 		defer resp.Body.Close()
@@ -42,7 +42,7 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 		// Get byte data
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Printf("byte read error: %v", err)
+			fmt.Printf("byte read error: %v\n", err)
 			return nil, err
 		}
 		// Cache data
@@ -50,7 +50,8 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &standings); err != nil {
-			fmt.Printf("unmarshalling error: %v", err)
+			fmt.Println(string(data))
+			fmt.Printf("unmarshalling error: %v\n", err)
 			return nil, err
 		}
 	}
@@ -93,7 +94,7 @@ func (cfg *apiConfig) buildPlayerHelper(i int, followedPlayer database.FollowedP
 	// Build stats for player
 	player, err := cfg.buildPlayerInfo(followedPlayer, pc)
 	if err != nil {
-		fmt.Println("error line 92")
+		fmt.Printf("build player error: %v\n", err)
 		errCh <- err
 		return
 	}
@@ -124,7 +125,6 @@ func (cfg *apiConfig) buildPlayerlist(playerList []database.FollowedPlayer, pc P
 	// Loop through channel, checking for err
 	for err := range errCh {
 		if err != nil {
-			fmt.Println("error line 123")
 			return nil, err
 		}
 	}
@@ -140,14 +140,14 @@ func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc
 	entry, ok := cfg.cache.Get(URL)
 	if ok {
 		if err := json.Unmarshal(entry, &stats); err != nil {
-			fmt.Println("error line 139")
+			fmt.Printf("unmarshal from cache error: %v\n", err)
 			return Player{}, err
 		}
 	} else {
 		// Make HTTP request
 		resp, err := http.Get(URL)
 		if err != nil {
-			fmt.Println("error line 145")
+			fmt.Printf("http request error: %v\n", err)
 			return Player{}, err
 		}
 		defer resp.Body.Close()
@@ -157,15 +157,15 @@ func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc
 		// Get byte data
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Println("error line 155")
+			fmt.Printf("byte read error: %v\n", err)
 			return Player{}, err
 		}
 		// Cache data
-		cfg.cache.Add(URL, data)
+		cfg.cache.Add(URL, data) //DONT ADD BAD DATA
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &stats); err != nil {
-			fmt.Println("error line 163")
+			fmt.Printf("unmarshal error: %v\n", err)
 			return Player{}, err
 		}
 	}
@@ -200,7 +200,7 @@ func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc
 	// Get playing today status
 	pt, err := cfg.playingToday(stats.CurrentTeamAbbrev, "", nil)
 	if err != nil {
-		fmt.Println("playing today error")
+		fmt.Printf("playing today error: %v", err)
 		return Player{}, err
 	}
 
@@ -252,15 +252,15 @@ func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Clie
 	// Check cache for data
 	entry, ok := cfg.cache.Get(url)
 	if ok {
-		fmt.Println("entry in cache")
 		if err := json.Unmarshal(entry, &schedule); err != nil {
+			fmt.Printf("unmarshal from cache error: %v\n", err)
 			return false, err
 		}
 	} else {
 		// Make HTTP request
 		resp, err := client.Get(url)
 		if err != nil {
-			fmt.Println("http error playing today")
+			fmt.Printf("http request error: %v\n", err)
 			return false, err
 		}
 		defer resp.Body.Close()
@@ -289,6 +289,7 @@ func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Clie
 		// Find game date
 		gameDate, err := time.Parse("2006-01-02", game.GameDate)
 		if err != nil {
+			fmt.Printf("parsing error: %v\n", err)
 			return false, nil
 		}
 		// Compare today to game date

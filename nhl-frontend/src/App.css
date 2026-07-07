@@ -1,3 +1,24 @@
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home-team-button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right-width: 1px;
+}
+
+.home-following-button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 1px;
+}
+/* .home-following-button:hover {
+  border-color: black;
+} */
+
 .player-card {
   width: 350px;
   padding: auto;
@@ -107,6 +128,7 @@ th {
 .team-logo {
   width: 75px;
   height: 75px;
+  margin-bottom: -10px;
 }
 
 .following-container {
@@ -142,12 +164,8 @@ th {
   color: black;
 }
 
-.follow-button {
-  margin-top: -20px;
-}
-
-.unfollow-button {
-  margin-top: -20px;
+.followed-player .unfollow-button {
+  margin-top: -10px;
 }
 
 .unfollow-button .unfollow {
@@ -239,11 +257,4 @@ th {
   padding-left: 3px;
   padding-right: 3px;
   font-size: larger;
-}
-
-.search-follow-button {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding-right: 5x;
 }
