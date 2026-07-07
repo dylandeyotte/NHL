@@ -27,12 +27,14 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 	entry, ok := cfg.cache.Get(URL)
 	if ok {
 		if err := json.Unmarshal(entry, &standings); err != nil {
+			fmt.Printf("unmarshalling error from cache: %v", err)
 			return nil, err
 		}
 	} else {
 		// Make HTTP request
 		resp, err := http.Get(URL)
 		if err != nil {
+			fmt.Printf("hhtp request error: %v", err)
 			return nil, err
 		}
 		defer resp.Body.Close()
@@ -40,6 +42,7 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 		// Get byte data
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
+			fmt.Printf("byte read error: %v", err)
 			return nil, err
 		}
 		// Cache data
@@ -47,6 +50,7 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &standings); err != nil {
+			fmt.Printf("unmarshalling error: %v", err)
 			return nil, err
 		}
 	}

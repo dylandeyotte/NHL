@@ -81,7 +81,14 @@ export function Following() {
             style={{ "--team-colour": team?.TriCode ? teamColours[team.TriCode] : "white" } as React.CSSProperties}
           >
             <h3>{team?.TeamName}</h3>
-            {team?.TeamName && <button onClick={() => handleUnfollowTeamClick(team?.TriCode)}>Unfollow</button>}
+            <div className="follow-button">
+              {team?.TeamName && (
+                <button onClick={() => handleUnfollowTeamClick(team?.TriCode)}>
+                  <span className="following">Following</span>
+                  <span className="unfollow">Unfollow</span>
+                </button>
+              )}
+            </div>
           </div>
         </pre>
       </div>
@@ -89,7 +96,7 @@ export function Following() {
         <div className="followed-page">
           {following &&
             following.map((player) => (
-              <div key={player.player_id} className="player-card">
+              <div key={player.player_id} className="followed-player">
                 <div className="accent-bar" style={{ "--team-colour": teamColours[player.team_abbrev] } as React.CSSProperties}>
                   {" "}
                 </div>
@@ -107,7 +114,12 @@ export function Following() {
                   </span>
                 </div>
                 <div className="draft-details">{player.draft_year === 0 ? "Undrafted" : `${player.draft_year} (#${player.draft_pos})`}</div>
-                <button onClick={() => handleUnfollowPlayerClick(player.player_id)}>Unfollow</button>
+                <div className="follow-button">
+                  <button onClick={() => handleUnfollowPlayerClick(player.player_id)}>
+                    <span className="following">Following</span>
+                    <span className="unfollow">Unfollow</span>
+                  </button>
+                </div>
               </div>
             ))}
         </div>

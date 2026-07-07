@@ -119,6 +119,7 @@ th {
   border-style: solid;
   border-radius: 8px;
   width: 350px;
+  padding-bottom: 3px;
   color: black;
   background-color: var(--team-colour);
 }
@@ -131,13 +132,36 @@ th {
 }
 
 .followed-player {
-  padding: auto;
   width: 350px;
+  height: auto;
+  padding-bottom: 5px;
   border-radius: 8px;
   border-style: solid;
   border-color: black;
   font-size: large;
   color: black;
+}
+
+.follow-button {
+  margin-top: -20px;
+}
+
+.follow-button button:hover {
+  color: red;
+  background: rgb(235, 130, 130);
+  border-color: rgb(235, 130, 130);
+}
+
+.follow-button .unfollow {
+  display: none;
+}
+
+.follow-button button:hover .following {
+  display: none;
+}
+
+.follow-button button:hover .unfollow {
+  display: inline;
 }
 
 .card-pob {
