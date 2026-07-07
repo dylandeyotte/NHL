@@ -146,22 +146,48 @@ th {
   margin-top: -20px;
 }
 
-.follow-button button:hover {
+.unfollow-button {
+  margin-top: -20px;
+}
+
+.unfollow-button .unfollow {
+  display: none;
+}
+
+.unfollow-button button:hover {
   color: red;
   background: rgb(235, 130, 130);
   border-color: rgb(235, 130, 130);
+}
+
+.unfollow-button button:hover .unfollow {
+  display: inline;
+  color: red;
+  background: rgb(235, 130, 130);
+  border-color: rgb(235, 130, 130);
+}
+
+.unfollow-button button:hover .following {
+  display: none;
+  color: red;
+  background: rgb(235, 130, 130);
+  border-color: rgb(235, 130, 130);
+}
+
+.follow-button button:hover {
+  display: inline;
 }
 
 .follow-button .unfollow {
   display: none;
 }
 
-.follow-button button:hover .following {
-  display: none;
+.follow-button button:hover .follow {
+  display: inline;
 }
 
 .follow-button button:hover .unfollow {
-  display: inline;
+  display: none;
 }
 
 .card-pob {
