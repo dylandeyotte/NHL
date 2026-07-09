@@ -72,43 +72,20 @@ export function Login() {
       throw err;
     }
   };
-  if (status === "SignUp") {
-    return (
-      <div>
-        <h1>NHL Tracker</h1>
-        <h2>Sign Up</h2>
-        <form onSubmit={handleCreateUser}>
-          <div className="form-container">
-            <label className="form-label">Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="form-input" />
-          </div>
-          <div className="form-container">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="form-input"
-            />
-          </div>
-          <button type="submit">Sign up</button>
-        </form>
-        <button onClick={() => setStatus("Login")}>Existing user?</button>
-      </div>
-    );
-  }
+
   return (
     <div className="login-page">
-      <h1>NHL Tracker</h1>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <div className="title">
+        <h1>NHL Tracker</h1>
+        <h3>{status === "Login" ? "Welcome" : "Create account"}</h3>
+      </div>
+      <form onSubmit={status === "Login" ? handleLogin : handleCreateUser}>
         <div className="form-container">
           <label className="form-label">Email</label>
           <input
             type="email"
-            value={loginEmail}
-            onChange={(e) => setLoginEmail(e.target.value)}
+            value={status === "Login" ? loginEmail : email}
+            onChange={status === "Login" ? (e) => setLoginEmail(e.target.value) : (e) => setEmail(e.target.value)}
             placeholder="Email"
             className="form-input"
           />
@@ -117,16 +94,22 @@ export function Login() {
           <label className="form-label">Password</label>
           <input
             type="password"
-            value={loginPassword}
-            onChange={(e) => setLoginPassword(e.target.value)}
-            placeholder="Password"
+            value={status === "Login" ? loginPassword : password}
+            onChange={status === "Login" ? (e) => setLoginPassword(e.target.value) : (e) => setPassword(e.target.value)}
+            placeholder={status === "Login" ? "Password" : "Create a password"}
             className="form-input"
           />
           {error && <p>{error}</p>}
         </div>
-        <button type="submit">Login</button>
+        <div className="login-button">
+          <button type="submit">Login</button>
+        </div>
       </form>
-      <button onClick={() => setStatus("SignUp")}>Create new account</button>
+      <div className="sign-up-button">
+        <button onClick={status === "Login" ? () => setStatus("SignUp") : () => setStatus("Login")}>
+          {status === "Login" ? "Create new account" : "Existing user?"}
+        </button>
+      </div>
     </div>
   );
 }

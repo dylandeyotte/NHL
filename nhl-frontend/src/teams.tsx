@@ -35,7 +35,10 @@ export function Teams() {
 
   return (
     <div>
-      <button onClick={() => navigate("/home")}>Home</button>
+      <h1>Teams</h1>
+      <button onClick={() => navigate("/home")} className="home-button">
+        Home
+      </button>
       {error && <p>{error}</p>}
       <pre>
         <div className="team-grid">

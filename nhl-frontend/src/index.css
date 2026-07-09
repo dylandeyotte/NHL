@@ -83,6 +83,12 @@ code {
   background: var(--code-bg);
 }
 
+h1,
+h2,
+h3 {
+  color: black;
+}
+
 button {
   border-style: solid;
   border-color: black;
@@ -96,6 +102,6 @@ button {
 }
 
 button:hover {
-  background-color: rgb(161, 160, 160);
-  border-color: rgb(161, 160, 160);
+  background-color: rgb(155, 200, 223);
+  border-color: rgb(155, 200, 223);
 }

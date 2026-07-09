@@ -92,7 +92,7 @@ export function Home() {
         </button>
       </div>
       <form onSubmit={handleSearch}>
-        <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-bar" />
       </form>
       <pre>
         <div className="players">

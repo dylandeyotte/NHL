@@ -54,9 +54,11 @@ export function Search() {
   return (
     <div>
       <h1>Search Results</h1>
-      <button onClick={() => navigate("/home")}>Home</button>
+      <button onClick={() => navigate("/home")} className="home-button">
+        Home
+      </button>
       <form onSubmit={handleSearch}>
-        <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-bar" />
       </form>
       <pre>
         <div className="search-page">
@@ -79,6 +81,7 @@ export function Search() {
                     <div className={player.isFollowed ? "unfollow-button" : "follow-button"}>
                       <button
                         onClick={() => (player.isFollowed ? handleUnfollowClick(player.playerId) : handleFollowClick(player.playerId))}
+                        className="search-follow-button"
                       >
                         {player.isFollowed ? "Unfollow" : "Follow"}
                       </button>

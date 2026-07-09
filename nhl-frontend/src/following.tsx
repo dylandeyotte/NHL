@@ -74,10 +74,12 @@ export function Following() {
     <div>
       <div className="following-container">
         <h1>Following</h1>
-        <button onClick={() => navigate("/home")}>Home</button>
+        <button onClick={() => navigate("/home")} className="home-button">
+          Home
+        </button>
         <pre>
           <div
-            className="followed-team-box"
+            className={team?.TeamName === "" ? "" : "followed-team-box"}
             style={{ "--team-colour": team?.TriCode ? teamColours[team.TriCode] : "white" } as React.CSSProperties}
           >
             <h3>{team?.TeamName}</h3>
