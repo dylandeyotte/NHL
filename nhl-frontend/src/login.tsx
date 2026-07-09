@@ -6,13 +6,17 @@ import { useNavigate } from "react-router-dom";
 export function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
+  //SIGN UP FOR EXISTING USER
+
   const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setStatus("Login");
 
     try {
       // HTTP request
@@ -68,35 +72,61 @@ export function Login() {
       throw err;
     }
   };
-
+  if (status === "SignUp") {
+    return (
+      <div>
+        <h1>NHL Tracker</h1>
+        <h2>Sign Up</h2>
+        <form onSubmit={handleCreateUser}>
+          <div className="form-container">
+            <label className="form-label">Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="form-input" />
+          </div>
+          <div className="form-container">
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="form-input"
+            />
+          </div>
+          <button type="submit">Sign up</button>
+        </form>
+        <button onClick={() => setStatus("Login")}>Existing user?</button>
+      </div>
+    );
+  }
   return (
-    <div>
+    <div className="login-page">
       <h1>NHL Tracker</h1>
-      <h2>Existing user?</h2>
+      <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        <div>
-          <label>Email</label>
-          <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+        <div className="form-container">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            value={loginEmail}
+            onChange={(e) => setLoginEmail(e.target.value)}
+            placeholder="Email"
+            className="form-input"
+          />
         </div>
-        <div>
-          <label>Password</label>
-          <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+        <div className="form-container">
+          <label className="form-label">Password</label>
+          <input
+            type="password"
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
+            placeholder="Password"
+            className="form-input"
+          />
           {error && <p>{error}</p>}
         </div>
         <button type="submit">Login</button>
       </form>
-      <h2>New user?</h2>
-      <form onSubmit={handleCreateUser}>
-        <div>
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </div>
-        <div>
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        </div>
-        <button type="submit">Sign up</button>
-      </form>
+      <button onClick={() => setStatus("SignUp")}>Create new account</button>
     </div>
   );
 }
