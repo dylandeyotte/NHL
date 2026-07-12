@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	pq "github.com/lib/pq"
+
 	"github.com/dylandeyotte/nhl/internal/auth"
 	"github.com/dylandeyotte/nhl/internal/database"
 )
@@ -95,6 +97,12 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) 
 		HashedPassword: hashedPassword,
 	})
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code == "23505" {
+				respondWithError(w, http.StatusBadRequest, "Email already in use", err)
+				return
+			}
+		}
 		respondWithError(w, http.StatusInternalServerError, "Unable to create user", err)
 		return
 	}

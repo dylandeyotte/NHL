@@ -12,8 +12,6 @@ export function Login() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  //SIGN UP FOR EXISTING USER
-
   const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("Login");
@@ -65,6 +63,11 @@ export function Login() {
         }),
       });
 
+      if (response.status === 400) {
+        setError("Email already in use");
+        return;
+      }
+
       const data = await response.json();
       console.log(data);
     } catch (err) {
@@ -99,10 +102,10 @@ export function Login() {
             placeholder={status === "Login" ? "Password" : "Create a password"}
             className="form-input"
           />
-          {error && <p>{error}</p>}
+          <div className="error">{error && <p>{error}</p>}</div>
         </div>
         <div className="login-button">
-          <button type="submit">Login</button>
+          <button type="submit">{status === "Login" ? "Login" : "Sign up"}</button>
         </div>
       </form>
       <div className="sign-up-button">

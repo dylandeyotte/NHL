@@ -348,6 +348,11 @@ th {
   font-size: medium;
 }
 
+.login-button button:hover {
+  background-color: rgb(218, 216, 216);
+  border-color: rgb(218, 216, 216);
+}
+
 .sign-up-button button {
   width: 200px;
   background-color: rgb(201, 50, 50);
@@ -360,4 +365,9 @@ th {
   background-color: rgb(171, 44, 44);
   border-color: rgb(171, 44, 44);
   font-size: medium;
+}
+
+.error {
+  width: 200px;
+  font-size: small;
 }
