@@ -37,8 +37,12 @@ export function Search() {
   }, [player]);
 
   async function handleSearch(e: React.SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault();
-    navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
+    try {
+      e.preventDefault();
+      navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
+    } catch (err) {
+      navigate("/");
+    }
   }
 
   async function handleFollowClick(id: string) {

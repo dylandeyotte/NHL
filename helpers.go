@@ -46,7 +46,9 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 			return nil, err
 		}
 		// Cache data
-		cfg.cache.Add(URL, data)
+		if err := cfg.cache.Add(URL, data); err != nil {
+			return nil, err
+		}
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &standings); err != nil {
@@ -161,7 +163,9 @@ func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc
 			return Player{}, err
 		}
 		// Cache data
-		cfg.cache.Add(URL, data) //DONT ADD BAD DATA
+		if err := cfg.cache.Add(URL, data); err != nil {
+			return Player{}, err
+		}
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &stats); err != nil {
@@ -274,7 +278,9 @@ func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Clie
 			return false, err
 		}
 		// Cache data
-		cfg.cache.Add(url, data)
+		if err := cfg.cache.Add(url, data); err != nil {
+			return false, err
+		}
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &schedule); err != nil {

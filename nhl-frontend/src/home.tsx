@@ -41,9 +41,13 @@ export function Home() {
 
   async function loadHome() {
     // HTTP request
-    const data = await fetchHelper("http://localhost:8080/api/home");
-    setHomeData(data.players);
-    setStandings(data.standings);
+    try {
+      const data = await fetchHelper("http://localhost:8080/api/home");
+      setHomeData(data.players);
+      setStandings(data.standings);
+    } catch (err) {
+      navigate("/");
+    }
   }
 
   async function fetchTeam() {
@@ -60,29 +64,40 @@ export function Home() {
     navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
-  if (standings.length === 0 && homeData.length === 0) {
-    return (
-      <div>
-        <h1>Home</h1>
-        <div className="button-row">
-          <button onClick={() => navigate("/teams")} className="home-team-button">
-            Teams
-          </button>
-          <button onClick={() => navigate("/following")} className="home-following-button">
-            Following
-          </button>
-        </div>
-        <form onSubmit={handleSearch}>
-          <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-        </form>
-        <h3>Follow some players!</h3>
-      </div>
-    );
+  async function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    navigate("/");
   }
+
+  // if (standings.length === 0 && homeData.length === 0) {
+  //   return (
+  //     <div>
+  //       <h1>Home</h1>
+  //       <div className="button-row">
+  //         <button onClick={() => navigate("/teams")} className="home-team-button">
+  //           Teams
+  //         </button>
+  //         <button onClick={() => navigate("/following")} className="home-following-button">
+  //           Following
+  //         </button>
+  //       </div>
+  //       <form onSubmit={handleSearch}>
+  //         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+  //       </form>
+  //       <h3>Follow some players!</h3>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="home-background">
-      <h1>Home</h1>
+      <div className="home-title">
+        <h1>Home</h1>
+        <button onClick={() => handleLogout()} className="logout-button">
+          Logout
+        </button>
+      </div>
       <div className="button-row">
         <button onClick={() => navigate("/teams")} className="home-team-button">
           Teams
@@ -95,6 +110,7 @@ export function Home() {
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-bar" />
       </form>
       <pre>
+        <h3>{standings.length === 0 && homeData.length === 0 && "Follow some players!"}</h3>
         <div className="players">
           {homeData.map((player) => (
             <div key={player.name} className="player-card">

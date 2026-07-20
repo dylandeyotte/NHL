@@ -10,8 +10,12 @@ export function Teams() {
   const [error, setError] = useState("");
 
   async function fetchTeam() {
-    const data = await fetchHelper("http://localhost:8080/api/following");
-    setFollowedTeam(data.team.TriCode);
+    try {
+      const data = await fetchHelper("http://localhost:8080/api/following");
+      setFollowedTeam(data.team.TriCode);
+    } catch (err) {
+      navigate("/");
+    }
   }
 
   async function handleFollowClick(tricode: string) {

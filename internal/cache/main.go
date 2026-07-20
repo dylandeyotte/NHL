@@ -1,6 +1,8 @@
 package cache
 
 import (
+	"errors"
+	"net/url"
 	"sync"
 	"time"
 )
@@ -25,14 +27,19 @@ func NewCache(interval time.Duration) Cache {
 	return cache
 }
 
-func (c *Cache) Add(key string, val []byte) {
+func (c *Cache) Add(key string, val []byte) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if !isValidURL(key) {
+		return errors.New("Bad URL")
+	}
 
 	c.entries[key] = cacheEntry{
 		createdAt: time.Now(),
 		val:       val,
 	}
+	return nil
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
@@ -59,4 +66,17 @@ func (c *Cache) killLoop(interval time.Duration) {
 		}
 		c.mu.Unlock()
 	}
+}
+
+func isValidURL(str string) bool {
+	url, err := url.ParseRequestURI(str)
+	if err != nil {
+		return false
+	}
+
+	if url.Scheme != "http" && url.Scheme != "https" {
+		return false
+	}
+
+	return url.Host != ""
 }

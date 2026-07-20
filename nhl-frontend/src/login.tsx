@@ -14,7 +14,6 @@ export function Login() {
 
   const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus("Login");
 
     try {
       // HTTP request
@@ -79,16 +78,15 @@ export function Login() {
   return (
     <div className="login-page">
       <div className="title">
-        <h1>NHL Tracker</h1>
-        <h3>{status === "Login" ? "Welcome" : "Create account"}</h3>
+        <h1>{status === "SignUp" ? "Create account" : "Welcome"}</h1>
       </div>
-      <form onSubmit={status === "Login" ? handleLogin : handleCreateUser}>
+      <form onSubmit={status === "SignUp" ? handleCreateUser : handleLogin}>
         <div className="form-container">
           <label className="form-label">Email</label>
           <input
             type="email"
-            value={status === "Login" ? loginEmail : email}
-            onChange={status === "Login" ? (e) => setLoginEmail(e.target.value) : (e) => setEmail(e.target.value)}
+            value={status === "SignUp" ? email : loginEmail}
+            onChange={status === "SignUp" ? (e) => setEmail(e.target.value) : (e) => setLoginEmail(e.target.value)}
             placeholder="Email"
             className="form-input"
           />
@@ -97,20 +95,20 @@ export function Login() {
           <label className="form-label">Password</label>
           <input
             type="password"
-            value={status === "Login" ? loginPassword : password}
-            onChange={status === "Login" ? (e) => setLoginPassword(e.target.value) : (e) => setPassword(e.target.value)}
-            placeholder={status === "Login" ? "Password" : "Create a password"}
+            value={status === "SignUp" ? password : loginPassword}
+            onChange={status === "SignUp" ? (e) => setPassword(e.target.value) : (e) => setLoginPassword(e.target.value)}
+            placeholder={status === "SignUp" ? "Create a Password" : "Password"}
             className="form-input"
           />
           <div className="error">{error && <p>{error}</p>}</div>
         </div>
         <div className="login-button">
-          <button type="submit">{status === "Login" ? "Login" : "Sign up"}</button>
+          <button type="submit">{status === "SignUp" ? "Sign up" : "Login"}</button>
         </div>
       </form>
       <div className="sign-up-button">
-        <button onClick={status === "Login" ? () => setStatus("SignUp") : () => setStatus("Login")}>
-          {status === "Login" ? "Create new account" : "Existing user?"}
+        <button onClick={status === "SignUp" ? () => setStatus("Login") : () => setStatus("SignUp")}>
+          {status === "SignUp" ? "Existing user?" : "Create new account"}
         </button>
       </div>
     </div>
