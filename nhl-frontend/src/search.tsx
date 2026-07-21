@@ -56,7 +56,7 @@ export function Search() {
   }
 
   return (
-    <div>
+    <div className="search-page">
       <h1>Search Results</h1>
       <button onClick={() => navigate("/home")} className="home-button">
         Home
@@ -65,7 +65,7 @@ export function Search() {
         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-bar" />
       </form>
       <pre>
-        <div className="search-page">
+        <div className="search-container">
           {results.length === 0
             ? "No results found"
             : results.map((player) => (

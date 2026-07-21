@@ -38,7 +38,7 @@ export function Teams() {
   }, []);
 
   return (
-    <div>
+    <div className="teams-page">
       <h1>Teams</h1>
       <button onClick={() => navigate("/home")} className="home-button">
         Home

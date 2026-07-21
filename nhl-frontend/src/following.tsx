@@ -71,7 +71,7 @@ export function Following() {
   }
 
   return (
-    <div>
+    <div className="following-page">
       <div className="following-container">
         <h1>Following</h1>
         <button onClick={() => navigate("/home")} className="home-button">
@@ -95,7 +95,7 @@ export function Following() {
         </pre>
       </div>
       <pre>
-        <div className="followed-page">
+        <div className="followed-container">
           {following &&
             following.map((player) => (
               <div key={player.player_id} className="followed-player">

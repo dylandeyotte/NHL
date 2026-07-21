@@ -91,7 +91,7 @@ export function Home() {
   // }
 
   return (
-    <div className="home-background">
+    <div className="home-page">
       <div className="home-title">
         <h1>Home</h1>
         <button onClick={() => handleLogout()} className="logout-button">

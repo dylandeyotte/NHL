@@ -80,36 +80,38 @@ export function Login() {
       <div className="title">
         <h1>{status === "SignUp" ? "Create account" : "Welcome"}</h1>
       </div>
-      <form onSubmit={status === "SignUp" ? handleCreateUser : handleLogin}>
-        <div className="form-container">
-          <label className="form-label">Email</label>
-          <input
-            type="email"
-            value={status === "SignUp" ? email : loginEmail}
-            onChange={status === "SignUp" ? (e) => setEmail(e.target.value) : (e) => setLoginEmail(e.target.value)}
-            placeholder="Email"
-            className="form-input"
-          />
+      <div className="login-box">
+        <form onSubmit={status === "SignUp" ? handleCreateUser : handleLogin}>
+          <div className="form-container">
+            <label className="form-label">Email</label>
+            <input
+              type="email"
+              value={status === "SignUp" ? email : loginEmail}
+              onChange={status === "SignUp" ? (e) => setEmail(e.target.value) : (e) => setLoginEmail(e.target.value)}
+              placeholder="Email"
+              className="form-input"
+            />
+          </div>
+          <div className="form-container">
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              value={status === "SignUp" ? password : loginPassword}
+              onChange={status === "SignUp" ? (e) => setPassword(e.target.value) : (e) => setLoginPassword(e.target.value)}
+              placeholder={status === "SignUp" ? "Create a Password" : "Password"}
+              className="form-input"
+            />
+            <div className="error">{error && <p>{error}</p>}</div>
+          </div>
+          <div className="login-button">
+            <button type="submit">{status === "SignUp" ? "Sign up" : "Login"}</button>
+          </div>
+        </form>
+        <div className="sign-up-button">
+          <button onClick={status === "SignUp" ? () => setStatus("Login") : () => setStatus("SignUp")}>
+            {status === "SignUp" ? "Existing user?" : "Create new account"}
+          </button>
         </div>
-        <div className="form-container">
-          <label className="form-label">Password</label>
-          <input
-            type="password"
-            value={status === "SignUp" ? password : loginPassword}
-            onChange={status === "SignUp" ? (e) => setPassword(e.target.value) : (e) => setLoginPassword(e.target.value)}
-            placeholder={status === "SignUp" ? "Create a Password" : "Password"}
-            className="form-input"
-          />
-          <div className="error">{error && <p>{error}</p>}</div>
-        </div>
-        <div className="login-button">
-          <button type="submit">{status === "SignUp" ? "Sign up" : "Login"}</button>
-        </div>
-      </form>
-      <div className="sign-up-button">
-        <button onClick={status === "SignUp" ? () => setStatus("Login") : () => setStatus("SignUp")}>
-          {status === "SignUp" ? "Existing user?" : "Create new account"}
-        </button>
       </div>
     </div>
   );
