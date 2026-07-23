@@ -36,9 +36,7 @@ export function Following() {
       setFollowing(data.players);
       setTeam(data.team);
     } catch (err) {
-      if (err instanceof Error && err.message === "REFRESH_EXPIRED") {
-        navigate("/");
-      }
+      navigate("/");
     }
   }
 
@@ -58,16 +56,6 @@ export function Following() {
     }
     await handleUnfollowTeam(tricode);
     loadFollowing();
-  }
-
-  if (team?.TeamName === "" && !following) {
-    return (
-      <div>
-        <h1>Following</h1>
-        <button onClick={() => navigate("/home")}>Home</button>
-        <h3>None</h3>
-      </div>
-    );
   }
 
   return (

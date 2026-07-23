@@ -111,12 +111,10 @@
 
 .playing {
   background-color: green;
-  box-shadow: inset;
 }
 
 .not-playing {
   background-color: red;
-  box-shadow: inset;
 }
 
 .stats {
@@ -369,8 +367,13 @@ th {
 
 /* Login page */
 
-.title {
-  margin-bottom: 90px;
+.login-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 100px;
+  color: black;
+  font-size: larger;
 }
 
 .login-page {
@@ -386,16 +389,17 @@ th {
 }
 
 .login-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   border-style: solid;
   border-color: black;
   border-radius: 8px;
   border-width: 2px;
   padding-bottom: 20px;
   padding-top: 5px;
-  width: 600px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 650px;
+  margin-top: -50px;
   backdrop-filter: blur(5px);
 }
 
@@ -451,6 +455,8 @@ th {
 }
 
 .error {
+  display: flex;
+  justify-content: center;
   width: 200px;
   font-size: small;
 }

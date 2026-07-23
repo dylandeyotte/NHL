@@ -60,7 +60,7 @@ export function Home() {
     (loadHome(), fetchTeam());
   }, []);
 
-  async function handleSearch() {
+  function handleSearch() {
     navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
@@ -69,26 +69,6 @@ export function Home() {
     localStorage.removeItem("refreshToken");
     navigate("/");
   }
-
-  // if (standings.length === 0 && homeData.length === 0) {
-  //   return (
-  //     <div>
-  //       <h1>Home</h1>
-  //       <div className="button-row">
-  //         <button onClick={() => navigate("/teams")} className="home-team-button">
-  //           Teams
-  //         </button>
-  //         <button onClick={() => navigate("/following")} className="home-following-button">
-  //           Following
-  //         </button>
-  //       </div>
-  //       <form onSubmit={handleSearch}>
-  //         <input type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-  //       </form>
-  //       <h3>Follow some players!</h3>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="home-page">

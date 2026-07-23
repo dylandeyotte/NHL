@@ -106,12 +106,31 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) 
 		respondWithError(w, http.StatusInternalServerError, "Unable to create user", err)
 		return
 	}
+	// Create JWT
+	token, err := auth.MakeJWT(user.ID, cfg.secret, 120*time.Minute)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Unable to create JWT", err)
+		return
+	}
+	// Create refresh token
+	refreshTokenString := auth.MakeRefreshToken()
+	_, err = cfg.database.CreateRefreshToken(r.Context(), database.CreateRefreshTokenParams{
+		Token:     refreshTokenString,
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Add(720 * time.Hour),
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Error creating refresh token", err)
+		return
+	}
 	// Create user for JSON
 	newUser := User{
-		ID:        user.ID,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		Email:     user.Email,
+		ID:           user.ID,
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
+		Email:        user.Email,
+		Token:        token,
+		RefreshToken: refreshTokenString,
 	}
 	// Respond with JSON
 	respondWithJSON(w, http.StatusOK, newUser)

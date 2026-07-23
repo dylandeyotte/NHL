@@ -66,19 +66,24 @@ export function Login() {
         setError("Email already in use");
         return;
       }
-
+      // Store tokens
       const data = await response.json();
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("refreshToken", data.refresh_token);
+
       console.log(data);
+      navigate("/home");
     } catch (err) {
-      console.error(`Request failed" ${err}`);
+      console.error(`Request failed: ${err}`);
       throw err;
     }
   };
 
   return (
     <div className="login-page">
-      <div className="title">
+      <div className="login-title">
         <h1>{status === "SignUp" ? "Create account" : "Welcome"}</h1>
+        <h4>Track players, follow a team, and stay up to date with the NHL</h4>
       </div>
       <div className="login-box">
         <form onSubmit={status === "SignUp" ? handleCreateUser : handleLogin}>

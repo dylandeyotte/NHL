@@ -27,8 +27,12 @@ export function Search() {
 
   async function loadSearch() {
     // HTTP request
-    const data = await fetchHelper(`http://localhost:8080/api/players/search?player=${player}`);
-    setResults(data);
+    try {
+      const data = await fetchHelper(`http://localhost:8080/api/players/search?player=${player}`);
+      setResults(data);
+    } catch (err) {
+      navigate("/");
+    }
   }
 
   // Run effect
@@ -36,13 +40,9 @@ export function Search() {
     loadSearch();
   }, [player]);
 
-  async function handleSearch(e: React.SyntheticEvent<HTMLFormElement>) {
-    try {
-      e.preventDefault();
-      navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
-    } catch (err) {
-      navigate("/");
-    }
+  function handleSearch(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
+    navigate(`/search?player=${encodeURIComponent(searchTerm)}`);
   }
 
   async function handleFollowClick(id: string) {
@@ -78,7 +78,9 @@ export function Search() {
                     <span>{player.teamAbbrev}</span>
                   </div>
                   <div className="card-pob">
-                    {player.birthCity}, {player.birthCountry === "CHE" ? "SUI" : player.birthCountry}
+                    {!player.birthCity
+                      ? `${player.birthCountry}`
+                      : `${player.birthCity}, ${player.birthCountry === "CHE" ? "SUI" : player.birthCountry}`}
                   </div>
                   <div className="card-bio">
                     {player.positionCode} | {player.height} | {player.weightInPounds} lbs

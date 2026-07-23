@@ -27,7 +27,7 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 	entry, ok := cfg.cache.Get(URL)
 	if ok {
 		if err := json.Unmarshal(entry, &standings); err != nil {
-			fmt.Printf("unmarshalling error from cache: %v\n", err)
+			fmt.Printf("unmarshalling standings error from cache: %v\n", err)
 			return nil, err
 		}
 	} else {
@@ -53,7 +53,7 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 		// Unmarshal data
 		if err := json.Unmarshal(data, &standings); err != nil {
 			fmt.Println(string(data))
-			fmt.Printf("unmarshalling error: %v\n", err)
+			fmt.Printf("unmarshalling standings error: %v\n", err)
 			return nil, err
 		}
 	}
@@ -164,6 +164,7 @@ func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc
 		}
 		// Cache data
 		if err := cfg.cache.Add(URL, data); err != nil {
+			fmt.Printf("Cannot cache bad data: %v\n", err)
 			return Player{}, err
 		}
 
