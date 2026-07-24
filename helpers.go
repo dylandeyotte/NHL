@@ -52,7 +52,6 @@ func (cfg *apiConfig) buildStandings(ft database.FollowedTeam) ([]Team, error) {
 
 		// Unmarshal data
 		if err := json.Unmarshal(data, &standings); err != nil {
-			fmt.Println(string(data))
 			fmt.Printf("unmarshalling standings error: %v\n", err)
 			return nil, err
 		}
@@ -118,7 +117,6 @@ func (cfg *apiConfig) buildPlayerlist(playerList []database.FollowedPlayer, pc P
 
 		// Concurrently build list of player stats
 		go cfg.buildPlayerHelper(i, followedPlayer, output, &wait, errCh, pc)
-		fmt.Println(followedPlayer.PlayerName)
 	}
 	// Wait for counter to zero and close channel
 	wait.Wait()
@@ -153,8 +151,6 @@ func (cfg *apiConfig) buildPlayerInfo(followedPlayer database.FollowedPlayer, pc
 			return Player{}, err
 		}
 		defer resp.Body.Close()
-
-		fmt.Println(resp.StatusCode)
 
 		// Get byte data
 		data, err := io.ReadAll(resp.Body)
@@ -270,8 +266,6 @@ func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Clie
 		}
 		defer resp.Body.Close()
 
-		fmt.Println("Status:", resp.StatusCode)
-
 		// Get byte data
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
@@ -307,7 +301,6 @@ func (cfg *apiConfig) playingToday(teamAbbrev, baseURL string, client *http.Clie
 		}
 
 	}
-	fmt.Printf("schedule for %v OK\n", teamAbbrev)
 	return gameCheck, nil
 }
 

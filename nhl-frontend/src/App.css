@@ -307,12 +307,21 @@ th {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  row-gap: 50px;
 }
 
 .team-logo {
   width: 75px;
   height: 75px;
   margin-bottom: -10px;
+}
+
+.team-error {
+  position: absolute;
+  margin-top: 180px;
+  justify-content: center;
+  font-size: medium;
+  color: red;
 }
 
 /* Search page */
@@ -454,7 +463,7 @@ th {
   font-size: medium;
 }
 
-.error {
+.login-error {
   display: flex;
   justify-content: center;
   width: 200px;

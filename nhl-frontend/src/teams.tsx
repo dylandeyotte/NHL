@@ -6,8 +6,9 @@ import { fetchHelper, handleFollowTeam, handleUnfollowTeam } from "./helpers";
 
 export function Teams() {
   const navigate = useNavigate();
-  const [followedTeam, setFollowedTeam] = useState();
   const [error, setError] = useState("");
+  const [errorTeam, setErrorTeam] = useState("");
+  const [followedTeam, setFollowedTeam] = useState();
 
   async function fetchTeam() {
     try {
@@ -21,6 +22,7 @@ export function Teams() {
   async function handleFollowClick(tricode: string) {
     if (followedTeam !== tricode && followedTeam !== "") {
       setError("Only one team may be followed");
+      setErrorTeam(tricode);
       return;
     }
     await handleFollowTeam(tricode);
@@ -43,7 +45,6 @@ export function Teams() {
       <button onClick={() => navigate("/home")} className="home-button">
         Home
       </button>
-      {error && <p>{error}</p>}
       <pre>
         <div className="team-grid">
           {teamList.map((team) => (
@@ -58,6 +59,7 @@ export function Teams() {
                   <span className="unfollow">Unfollow</span>
                 </button>
               </div>
+              {errorTeam === team.tricode && <div className="team-error">{error}</div>}
             </div>
           ))}
         </div>

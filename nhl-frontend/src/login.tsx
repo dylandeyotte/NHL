@@ -106,7 +106,7 @@ export function Login() {
               placeholder={status === "SignUp" ? "Create a Password" : "Password"}
               className="form-input"
             />
-            <div className="error">{error && <p>{error}</p>}</div>
+            <div className="login-error">{error && <p>{error}</p>}</div>
           </div>
           <div className="login-button">
             <button type="submit">{status === "SignUp" ? "Sign up" : "Login"}</button>
