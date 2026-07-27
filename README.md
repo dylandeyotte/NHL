@@ -1,7 +1,9 @@
 # NHL Tracker
+
 NHL Tracker is a RESTful backend API server for tracking and following your favourite players and team.
 
 ## Motivation
+
 I wanted an easier way to montior the stats of players without regularly searching for player or sifting through pages of players I don't care about. I created NHL Tracker to have a condensed list of players I care about, whether that's surging rookies or my favourite players, with easy to read stats that give me a broad outlook on how they are performing.
 
 ## Quick Start
@@ -9,13 +11,17 @@ I wanted an easier way to montior the stats of players without regularly searchi
 ### Docker
 
 #### Step 1
+
 Pull the image
+
 ```
 docker pull dylandeyotte/nhl-api:latest
 ```
 
 #### Step 2
+
 Run
+
 ```
 docker run --rm -p 8080:8080 \
   -e DB_URL="postgres://[USER]:@host.docker.internal:5432/nhl?sslmode=disable" \
@@ -23,11 +29,14 @@ docker run --rm -p 8080:8080 \
   -e PLATFORM="dev" \
   -e TZ="[YOUR TIMEZONE]" \
   dylandeyotte/nhl-api
-  ```
+```
+
 - Secret can be generated with:
+
 ```
 openssl rand -base64 64
 ```
+
 Timezones found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 
 ### Run locally
@@ -35,16 +44,21 @@ Timezones found [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zo
 #### Prerequisites
 
 Tested on:
+
 - [Go 1.21](https://go.dev/doc/install)
+
 - [PostgreSQL 15](https://www.postgresql.org)
 
 #### Step 1
+
 Create database
+
 ```
 createdb nhl // Or whatever name you like
 ```
 
 #### Step 2
+
 - Set environment variables
 - Create .env file with the following:
 
@@ -53,13 +67,17 @@ DB_URL = "postgres://[USER]:@localhost:5432/[DATABASE NAME]?sslmode=disable"
 SECRET = [JWT SECRET]
 PLATFORM = "dev"
 ```
+
 - Secret can be generated with:
+
 ```
 openssl rand -base64 64
 ```
 
 #### Step 3
+
 Make migrations:
+
 ```
 export DATABASE_URL=[YOUR DB_URL]
 make migrate
@@ -68,13 +86,17 @@ make migrate
 Alternatively, you can run migrations with goose if you have it
 
 #### Step 4
+
 Load teams into the database with:
+
 ```
 go run ./cmd/load_teams
 ```
 
 #### Step 5
+
 Run the server
+
 ```
 go run .
 ```

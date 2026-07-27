@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,6 +16,8 @@ import (
 
 	_ "github.com/lib/pq"
 )
+
+const frontendDir = "./nhl-frontend/dist"
 
 type apiConfig struct {
 	database *database.Queries
@@ -81,6 +84,18 @@ func corsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func handlerFrontend(w http.ResponseWriter, r *http.Request) {
+	path := filepath.Join(frontendDir, r.URL.Path)
+
+	info, err := os.Stat(path)
+	if err == nil && !info.IsDir() {
+		http.ServeFile(w, r, path)
+		return
+	}
+
+	http.ServeFile(w, r, filepath.Join(frontendDir, "index.html"))
+}
+
 func main() {
 	// Load data from ENV
 	godotenv.Load()
@@ -114,6 +129,8 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", handlerFrontend)
 
 	mux.HandleFunc("POST /api/login", apiCfg.handlerLogin)
 	mux.HandleFunc("POST /api/users", apiCfg.handlerCreateUser)

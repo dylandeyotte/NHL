@@ -1,3 +1,19 @@
+FROM node:22-alpine AS frontend-builder
+
+WORKDIR /frontend
+
+COPY nhl-frontend/package.json nhl-frontend/package-lock.json ./
+
+RUN npm ci
+
+COPY nhl-frontend/ ./
+
+RUN npm run build
+
+
+
+#Backend
+
 FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
@@ -23,6 +39,7 @@ COPY --from=builder /app/nhl /bin/nhl
 COPY --from=builder /app/sql/schema /sql/schema
 COPY --from=builder /app/load_teams /bin/load_teams
 COPY --from=builder /go/bin/goose /bin/goose
+COPY --from=frontend-builder /frontend/dist /app/nhl-frontend/dist
 
 EXPOSE 8080
 
