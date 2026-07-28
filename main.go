@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -85,14 +86,16 @@ func corsMiddleware(next http.Handler) http.Handler {
 }
 
 func handlerFrontend(w http.ResponseWriter, r *http.Request) {
+	// Join filepath
 	path := filepath.Join(frontendDir, r.URL.Path)
 
+	// Serve file if not directory
 	info, err := os.Stat(path)
 	if err == nil && !info.IsDir() {
 		http.ServeFile(w, r, path)
 		return
 	}
-
+	// Serve index.html
 	http.ServeFile(w, r, filepath.Join(frontendDir, "index.html"))
 }
 
@@ -156,6 +159,7 @@ func main() {
 	}
 	defer server.Close()
 
+	fmt.Println("Listening on port 8080")
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}

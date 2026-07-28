@@ -10,8 +10,6 @@ COPY nhl-frontend/ ./
 
 RUN npm run build
 
-
-
 #Backend
 
 FROM golang:1.25-alpine AS builder
@@ -30,6 +28,8 @@ RUN CGO_ENABLED=0 go build -o nhl .
 RUN CGO_ENABLED=0 go build -o load_teams ./cmd/load_teams
 
 FROM debian:stable-slim
+
+WORKDIR /app
 
 RUN apt-get update && \
     apt-get install -y ca-certificates tzdata && \

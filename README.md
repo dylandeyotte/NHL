@@ -1,6 +1,6 @@
 # NHL Tracker
 
-NHL Tracker is a RESTful backend API server for tracking and following your favourite players and team.
+NHL Tracker is a web app for tracking and following your favourite players and team.
 
 ## Motivation
 
@@ -15,7 +15,7 @@ I wanted an easier way to montior the stats of players without regularly searchi
 Pull the image
 
 ```
-docker pull dylandeyotte/nhl-api:latest
+docker pull dylandeyotte/nhl-tracker:latest
 ```
 
 #### Step 2
@@ -28,7 +28,7 @@ docker run --rm -p 8080:8080 \
   -e SECRET="[JWT SECRET]" \
   -e PLATFORM="dev" \
   -e TZ="[YOUR TIMEZONE]" \
-  dylandeyotte/nhl-api
+  nhl-tracker
 ```
 
 - Secret can be generated with:

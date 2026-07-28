@@ -1,0 +1,5 @@
+.env
+nhl
+out
+.gitignore
+node_modules
